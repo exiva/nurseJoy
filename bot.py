@@ -6,7 +6,7 @@ from discord.ext import commands
 import config
 
 cogs = [
-    'cogs.announcements'
+    'cogs.admin',
 ]
 
 class Bot(commands.Bot):
