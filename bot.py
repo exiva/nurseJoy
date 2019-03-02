@@ -5,11 +5,14 @@ import discord
 from discord.ext import commands
 import config
 
+cogs = [
+    'cogs.announcements'
+]
 
 class Bot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(command_prefix=commands.when_mentioned_or('!'), **kwargs)
-        for cog in config.cogs:
+        for cog in cogs:
             try:
                 self.load_extension(cog)
             except Exception as exc:
