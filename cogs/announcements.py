@@ -8,7 +8,7 @@ from distutils.version import StrictVersion
 from twitter import *
 
 
-class annoncements:
+class annoncements(commands.Cog):
     """Announcements cog
 
        Posts Tweet announcements, and version forces
@@ -28,8 +28,11 @@ class annoncements:
             ]
         self.currentVersion = "0.0.0"
 
-    def __unload(self):
-        self.task.cancel()
+    def cog_unload(self):
+        print("Unloading announcements module...")
+        self.tweetTask.cancel()
+        self.versionTask.cancel()
+
         pass
 
     async def on_ready(self):
