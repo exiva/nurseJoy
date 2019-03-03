@@ -3,30 +3,18 @@
 from discord.ext import commands
 import discord
 
-class Admin:
+class Admin(commands.Cog):
     """System commands"""
 
     def __init__(self, bot):
         self.bot = bot
 
-    def __unload(self):
+    def cog_unload(self):
         # clean up logic goes here
         pass
 
-    async def __local_check(self, ctx):
+    async def cog_check(self, ctx):
         return await self.bot.is_owner(ctx.author)
-
-    async def __error(self, ctx, error):
-        # error handling to every command in here
-        pass
-
-    async def __before_invoke(self, ctx):
-        # called before a command is called here
-        pass
-
-    async def __after_invoke(self, ctx):
-        # called after a command is called here
-        pass
 
     @commands.command()
     async def load(self, ctx, *, module):
