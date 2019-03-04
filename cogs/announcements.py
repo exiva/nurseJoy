@@ -35,6 +35,7 @@ class annoncements(commands.Cog):
 
         pass
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.announcements = self.bot.get_channel(345910796016156676)
         self.tweetTask = self.bot.loop.create_task(self.checkTweets())
