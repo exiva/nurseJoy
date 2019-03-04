@@ -57,7 +57,7 @@ class Admin(commands.Cog):
         await ctx.send("Shutting down.")
         await self.bot.logout()
 
-    @commands.command()
+        @commands.command()
     async def clear(self, ctx):
         try:
             msg = await ctx.send(f"Would you really like to clear **all** messages?")
