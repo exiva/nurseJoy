@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import asyncio
 from inspect import cleandoc
 import typing
 import pytz
@@ -55,6 +56,29 @@ class Admin(commands.Cog):
     async def shutdown(self, ctx):
         await ctx.send("Shutting down.")
         await self.bot.logout()
+
+        @commands.command()
+    async def clear(self, ctx):
+        try:
+            msg = await ctx.send(f"Would you really like to clear **all** messages?")
+            await msg.add_reaction('👍')
+            await msg.add_reaction('👎')
+
+            def check(reaction, user):
+                return user == ctx.message.author and str(reaction.emoji) == '👍'
+
+            try:
+                reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=5.0)
+            except asyncio.TimeoutError:
+                return
+
+            if str(reaction.emoji) == '👍':
+                await ctx.channel.purge(bulk=True, limit=9000)
+            else:
+                return
+
+        except Exception as e:
+            print(e)
 
     @commands.command()
     async def kick(self, ctx, member: discord.Member, *, reason=None):

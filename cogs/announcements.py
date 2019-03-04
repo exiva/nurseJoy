@@ -18,10 +18,10 @@ class annoncements(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.t = Twitter(auth=OAuth(
-                '***REMOVED***',
-                '***REMOVED***',
-                '***REMOVED***',
-                '***REMOVED***'))
+                '630713-FUwZlUfwULM9OecKcCvFekk1t95YMk8KUC6Wl58IcAz',
+                'zk8iIm8bft1OTm3C9TDjLnIwUP0TnPUk7uVNNppu43MLg',
+                'O39ryCasRdZsyx2LYZIMq8Dnm',
+                'MpiRNC0CaUGpZjwmFqdgrF6pFcvuVzDFQcey5h5Sm6kBvXIm51'))
         self.twitters = [
             ['PokemonGoApp', False, None],
             ['chrales', True, None]
@@ -35,6 +35,7 @@ class annoncements(commands.Cog):
 
         pass
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.announcements = self.bot.get_channel(345910796016156676)
         self.tweetTask = self.bot.loop.create_task(self.checkTweets())
