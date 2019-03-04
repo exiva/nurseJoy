@@ -7,11 +7,12 @@ import config
 
 cogs = [
     'cogs.admin',
+    'cogs.announcements',
 ]
 
 class Bot(commands.Bot):
     def __init__(self, **kwargs):
-        super().__init__(command_prefix=commands.when_mentioned_or('!'), **kwargs)
+        super().__init__(command_prefix='!', **kwargs)
         for cog in cogs:
             try:
                 self.load_extension(cog)
@@ -20,7 +21,7 @@ class Bot(commands.Bot):
 
     async def on_ready(self):
         print('Logged on as {0} (ID: {0.id})'.format(self.user))
-
+        await bot.change_presence(activity=discord.Game(name='at the Pokémon Center!'))
 
 bot = Bot()
 
