@@ -9,8 +9,11 @@ from datetime import datetime
 import discord
 
 
-class Admin(commands.Cog):
-    """System commands"""
+class System(commands.Cog):
+    """
+    System commands
+
+    """
 
     def __init__(self, bot):
         self.bot = bot
@@ -36,7 +39,7 @@ class Admin(commands.Cog):
 
     @commands.command()
     async def unload(self, ctx, *, module):
-        if module == 'admin':
+        if module == str(self.__cog_name__).lower():
             await ctx.send("Can't unload system module.")
             return True
         try:
@@ -57,28 +60,42 @@ class Admin(commands.Cog):
         await ctx.send("Shutting down.")
         await self.bot.logout()
 
-        @commands.command()
+    @commands.command()
     async def clear(self, ctx):
+        msg = await ctx.send(f"Would you really like to clear **all** messages?")
+        await msg.add_reaction('👍')
+        await msg.add_reaction('👎')
+
+        def check(reaction, user):
+            return user == ctx.message.author and str(reaction.emoji) == '👍'
+
         try:
-            msg = await ctx.send(f"Would you really like to clear **all** messages?")
-            await msg.add_reaction('👍')
-            await msg.add_reaction('👎')
+            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=5.0)
+        except asyncio.TimeoutError:
+            await msg.delete()
+            return
+        else:
+            await ctx.channel.purge(bulk=True, limit=9000)
 
-            def check(reaction, user):
-                return user == ctx.message.author and str(reaction.emoji) == '👍'
+    @commands.command()
+    async def sclear(self, ctx):
+        msg = await ctx.send(f"Would you really like to clear everything but pinned messages?")
+        await msg.add_reaction('👍')
+        await msg.add_reaction('👎')
 
-            try:
-                reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=5.0)
-            except asyncio.TimeoutError:
-                return
+        def check(reaction, user):
+            return user == ctx.message.author and str(reaction.emoji) == '👍'
 
-            if str(reaction.emoji) == '👍':
-                await ctx.channel.purge(bulk=True, limit=9000)
-            else:
-                return
+        def deleteCheck(message):
+            return not message.pinned
 
-        except Exception as e:
-            print(e)
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=5.0)
+        except asyncio.TimeoutError:
+            await msg.delete()
+            return
+        else:
+            await ctx.channel.purge(bulk=True, limit=9000, check=deleteCheck)
 
     @commands.command()
     async def kick(self, ctx, member: discord.Member, *, reason=None):
@@ -129,4 +146,4 @@ class Admin(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Admin(bot))
+    bot.add_cog(System(bot))

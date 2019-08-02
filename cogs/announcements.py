@@ -18,10 +18,10 @@ class annoncements(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.t = Twitter(auth=OAuth(
-                '630713-FUwZlUfwULM9OecKcCvFekk1t95YMk8KUC6Wl58IcAz',
-                'zk8iIm8bft1OTm3C9TDjLnIwUP0TnPUk7uVNNppu43MLg',
-                'O39ryCasRdZsyx2LYZIMq8Dnm',
-                'MpiRNC0CaUGpZjwmFqdgrF6pFcvuVzDFQcey5h5Sm6kBvXIm51'))
+                '***REMOVED***',
+                '***REMOVED***',
+                '***REMOVED***',
+                '***REMOVED***'))
         self.twitters = [
             ['PokemonGoApp', False, None],
             ['chrales', True, None]
