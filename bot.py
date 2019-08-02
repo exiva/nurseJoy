@@ -6,7 +6,7 @@ from discord.ext import commands
 import config
 
 cogs = [
-    'cogs.admin',
+    'cogs.system',
     'cogs.announcements',
 ]
 
@@ -23,7 +23,6 @@ class Bot(commands.Bot):
         print('Logged on as {0} (ID: {0.id})'.format(self.user))
         await bot.change_presence(activity=discord.Game(name='at the Pokémon Center!'))
 
-bot = Bot()
 
-# write general commands here
+bot = Bot()
 bot.run(config.token)
