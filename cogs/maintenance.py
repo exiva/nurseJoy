@@ -54,7 +54,7 @@ class Maintenance(commands.Cog):
         )
 
         await trades_channel.purge(
-            before=datetime.datetime.now() - timedelta(days=7),
+            before=datetime.datetime.utcnow() - timedelta(days=7),
             bulk=True,
             check=lambda m: not m.pinned,
         )
