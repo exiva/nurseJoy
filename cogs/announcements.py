@@ -51,7 +51,7 @@ class announcements(commands.Cog):
             tweets = self.t.statuses.user_timeline(screen_name=user[0])
             if not user[2]:
                 user[2] = tweets[0]['id_str']
-            elif user[2] != tweets[0]['id_str'] and (tweets[0]['in_reply_to_screen_name'] is None or tweets[0]['in_reply_to_screen_name'] == user[0]):
+            elif user[2] != tweets[0]['id_str'] and (None, user[0]) in tweets[0]['in_reply_to_screen_name']:
                 msg = f"https://twitter.com/{user[0]}/status/{tweets[0]['id_str']}"
                 if user[1]:  # Spoiler tweet
                     msg = f"|| {msg} ||"
