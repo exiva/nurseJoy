@@ -7,6 +7,7 @@ from discord.ext import tasks, commands
 from distutils.version import StrictVersion
 from twitter import *
 
+import aiohttp
 
 class announcements(commands.Cog):
     """Announcements cog
@@ -59,12 +60,13 @@ class announcements(commands.Cog):
 
     @tasks.loop(minutes=5)
     async def checkVersionForce(self):
-        with urllib.request.urlopen('https://pgorelease.nianticlabs.com/plfe/version') as version:
-            version = version.read().decode('utf-8')[2:]
-            if self.currentVersion != "0.0.0" and StrictVersion(self.currentVersion) < StrictVersion(version):
-                await self.ann_chan.send(f"Pokemon Go update forced to version {version}. Check for updates in your App Store.")
-            self.currentVersion = version
-            await asyncio.sleep(300)
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://pgorelease.nianticlabs.com/plfe/version") as resp:
+                version = await resp.text('utf-8')
+                version = version[2:]
+                if self.currentVersion != "0.0.1" and StrictVersion(self.currentVersion) < StrictVersion(version):
+                    await self.ann_chan.send(f"Pokemon Go update forced to version {version}. Check for updates in your App Store.")
+                self.currentVersion = version
 
     # wait for bot to connect before starting tasks
     @checkTweets.before_loop
