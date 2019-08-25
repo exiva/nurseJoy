@@ -38,7 +38,7 @@ class announcements(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.announcements = discord.utils.get(
+        self.ann_chan = discord.utils.get(
             self.bot.get_all_channels(),
             guild__id=339074243838869504,
             name="lab-1",
@@ -50,11 +50,11 @@ class announcements(commands.Cog):
             tweets = self.t.statuses.user_timeline(screen_name=user[0])
             if not user[2]:
                 user[2] = tweets[0]['id_str']
-            elif user[2] != tweets[0]['id_str'] and tweets[0]['in_reply_to_screen_name'] is None:
+            elif user[2] != tweets[0]['id_str'] and (tweets[0]['in_reply_to_screen_name'] is None or tweets[0]['in_reply_to_screen_name'] == user[0]):
                 msg = f"https://twitter.com/{user[0]}/status/{tweets[0]['id_str']}"
                 if user[1]:  # Spoiler tweet
                     msg = f"|| {msg} ||"
-                await self.announcements.send(msg)
+                await self.ann_chan.send(msg)
             user[2] = tweets[0]['id_str']
 
     @tasks.loop(minutes=5)
@@ -62,16 +62,16 @@ class announcements(commands.Cog):
         with urllib.request.urlopen('https://pgorelease.nianticlabs.com/plfe/version') as version:
             version = version.read().decode('utf-8')[2:]
             if self.currentVersion != "0.0.0" and StrictVersion(self.currentVersion) < StrictVersion(version):
-                await self.announcements.send(f"Pokemon Go update forced to version {version}. Check for updates in your App Store.")
+                await self.ann_chan.send(f"Pokemon Go update forced to version {version}. Check for updates in your App Store.")
             self.currentVersion = version
             await asyncio.sleep(300)
 
     # wait for bot to connect before starting tasks
-    @checkTweets.before_loop()
+    @checkTweets.before_loop
     async def before_checktweets(self):
         await self.bot.wait_until_ready()
 
-    @checkVersionForce.before_loop()
+    @checkVersionForce.before_loop
     async def before_checkVersionForce(self):
         await self.bot.wait_until_ready()
 
