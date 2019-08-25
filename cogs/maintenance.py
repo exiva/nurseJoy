@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import asyncio
 import datetime
 from discord.ext import tasks, commands
 import discord
@@ -62,6 +63,23 @@ class Maintenance(commands.Cog):
     @cleantrades.before_loop
     async def before_cleantrades(self):
         await self.bot.wait_until_ready()
+
+    @commands.Cog.listener()
+    async def on_guild_channel_create(self, channel):
+        isRaidCat = discord.utils.find(lambda c: c.name.startswith("🖼"), channel.category.channels)
+
+        def isHemlock(msg):
+            if msg.channel == channel and msg.author.display_name == "Professor Hemlock" and msg.embeds:
+                return msg
+
+        if isRaidCat:
+            try:
+                message = await self.bot.wait_for('message', check=isHemlock)
+            except asyncio.TimeoutError:
+                pass
+            else:
+                await channel.send("**Note**: This channel will self destruct after the raid has completed. Only use this channel for raid coordination.")
+                await channel.send(f"To get automatically alerted of raids at {message.embeds[0].title} in the future, send `!notify gym {message.embeds[0].title}` in <#{isRaidCat.id}>")
 
 def setup(bot):
     bot.add_cog(Maintenance(bot))
