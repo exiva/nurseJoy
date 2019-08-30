@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6138da59e17e3c07ed03023b0ded8528c1e454e6058eeba51cfd337a0d7b98cb"
+            "sha256": "99c014d463047fa802c79351043c21973beafced8ce87d57be74f9d86b73f0d1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -74,9 +74,9 @@
         },
         "discord.py": {
             "hashes": [
-                "sha256:d0ab22f1fee1fcc02ac50a67ff49a5d1f6d7bc7eba77e34e35bd160b3ad3d7e8"
+                "sha256:4684733fa137cc7def18087ae935af615212e423e3dbbe3e84ef01d7ae8ed17d"
             ],
-            "version": "==1.1.1"
+            "version": "==1.2.3"
         },
         "idna": {
             "hashes": [
@@ -119,13 +119,21 @@
             ],
             "version": "==4.5.2"
         },
-        "pytz": {
+        "peony-twitter": {
             "hashes": [
-                "sha256:303879e36b721603cc54604edcac9d20401bdbe31e1e4fdee5b9f98d5d31dfda",
-                "sha256:d747dd3d23d77ef44c6a3526e274af6efeb0a6f1afd5a69ba4d5be4098c8e141"
+                "sha256:3f3d2110001f87a8b5d6b2ed851d89954bb376bee88087b931f6f2bda1d434df",
+                "sha256:5faf7a36b74dc041a0c40d6e27a0f0d9ac11a9a611f905b5fa262529f836934d"
             ],
             "index": "pypi",
-            "version": "==2019.1"
+            "version": "==1.1.5"
+        },
+        "pytz": {
+            "hashes": [
+                "sha256:26c0b32e437e54a18161324a2fca3c4b9846b74a8dccddd843113109e1116b32",
+                "sha256:c894d57500a4cd2d5c71114aaab77dbab5eabd9022308ce5ac9bb93a60a6f0c7"
+            ],
+            "index": "pypi",
+            "version": "==2019.2"
         },
         "twitter": {
             "hashes": [

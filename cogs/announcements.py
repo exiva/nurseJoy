@@ -4,7 +4,7 @@ import aiohttp
 import discord
 from discord.ext import tasks, commands
 from distutils.version import StrictVersion
-from twitter import *
+from peony import PeonyClient
 
 
 class announcements(commands.Cog):
@@ -16,14 +16,14 @@ class announcements(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.t = Twitter(auth=OAuth(
-                '***REMOVED***',
-                '***REMOVED***',
-                '***REMOVED***',
-                '***REMOVED***'))
+        self.t = PeonyClient(consumer_key='***REMOVED***',
+                             consumer_secret='***REMOVED***',
+                             access_token='***REMOVED***',
+                             access_token_secret='***REMOVED***',
+                             )
         self.twitters = [
             ['PokemonGoApp', False, None],
-            ['chrales', True, None]
+            ['chrales', True, None],
             ]
         self.currentVersion = "0.0.0"
         self.checkTweets.start()
@@ -46,15 +46,20 @@ class announcements(commands.Cog):
     @tasks.loop(seconds=30)
     async def checkTweets(self):
         for user in self.twitters:
-            tweets = self.t.statuses.user_timeline(screen_name=user[0])
+            tweets = await self.t.api.statuses.user_timeline.get(screen_name=user[0], count=1)
+            tweet = tweets[0]
             if not user[2]:
-                user[2] = tweets[0]['id_str']
-            elif user[2] != tweets[0]['id_str'] and (None, user[0]) in tweets[0]['in_reply_to_screen_name']:
-                msg = f"https://twitter.com/{user[0]}/status/{tweets[0]['id_str']}"
+                user[2] = tweet.id_str
+            elif user[2] != tweet.id_str and tweet.in_reply_to_screen_name in (None, user[0]):
+                msg = f"https://twitter.com/{user[0]}/status/{tweet.id_str}"
                 if user[1]:  # Spoiler tweet
                     msg = f"|| {msg} ||"
                 await self.ann_chan.send(msg)
-            user[2] = tweets[0]['id_str']
+            user[2] = tweet.id_str
+
+    @checkTweets.after_loop
+    async def on_checkTweets_cancel(self):
+        await self.t.close()
 
     @tasks.loop(minutes=5)
     async def checkVersionForce(self):

@@ -8,7 +8,7 @@ verify_ssl = true
 [packages]
 discord = "*"
 pytz = "*"
-twitter = "*"
+peony-twitter = "*"
 
 [requires]
 python_version = "3.7"
