@@ -67,7 +67,7 @@ class announcements(commands.Cog):
             async with session.get("https://pgorelease.nianticlabs.com/plfe/version") as resp:
                 version = await resp.text('utf-8')
                 version = version[2:]
-                if self.currentVersion != "0.0.1" and StrictVersion(self.currentVersion) < StrictVersion(version):
+                if self.currentVersion != "0.0.0" and StrictVersion(self.currentVersion) < StrictVersion(version):
                     await self.ann_chan.send(f"Pokemon Go update forced to version {version}. Check for updates in your App Store.")
                 self.currentVersion = version
 
