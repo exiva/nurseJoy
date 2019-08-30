@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import asyncio
+import aiohttp
 import discord
-import urllib.request
 from discord.ext import tasks, commands
 from distutils.version import StrictVersion
 from twitter import *
 
-import aiohttp
 
 class announcements(commands.Cog):
     """Announcements cog
