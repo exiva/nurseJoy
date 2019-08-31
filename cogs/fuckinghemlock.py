@@ -3,39 +3,40 @@
 from discord.ext import commands
 import discord
 
+
 class fuckingHemlock(commands.Cog):
-    """The description for fuckingHemlock goes here."""
+    """
+
+        Run tasks to keep welcome channel at top. For some reason Hemlock
+        moves the last used ongoing raids channel as default.
+
+    """
 
     def __init__(self, bot):
+        print(f"Loaded {self.__class__.__name__} cog")
         self.bot = bot
 
-    def cog_unload(self):
-        # clean up logic goes here
-        pass
+    @commands.Cog.listener()
+    async def on_guild_channel_create(self, channel):
+        isRaidCat = discord.utils.find(lambda c: c.name.startswith("🖼"), channel.category.channels)
+        if isRaidCat:
+            welcomeChannel = discord.utils.get(
+                self.bot.get_all_channels(),
+                guild__id=339074243838869504,
+                name="welcome",
+            )
+            await welcomeChannel.edit(position=0)
 
-    async def cog_check(self, ctx):
-        # checks that apply to every command in here
-        return True
-
-    async def bot_check(self, ctx):
-        # checks that apply to every command to the bot
-        return True
-
-    async def bot_check_once(self, ctx):
-        # check that apply to every command but is guaranteed to be called only once
-        return True
-
-    async def cog_command_error(self, ctx, error):
-        # error handling to every command in here
-        pass
-
-    async def cog_before_invoke(self, ctx):
-        # called before a command is called here
-        pass
-
-    async def cog_after_invoke(self, ctx):
-        # called after a command is called here
-        pass
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel):
+        isRaidCat = discord.utils.find(lambda c: c.name.startswith("🖼"), channel.category.channels)
+        if isRaidCat:
+            welcomeChannel = discord.utils.get(
+                self.bot.get_all_channels(),
+                guild__id=339074243838869504,
+                name="welcome",
+            )
+            await welcomeChannel.edit(position=0)
 
 
 def setup(bot):
