@@ -14,7 +14,6 @@ class Mod(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self._last_member = None
 
     def cog_unload(self):
         # clean up logic goes here
@@ -46,7 +45,11 @@ class Mod(commands.Cog):
         embed.add_field(name='Joined Discord', value=self.convert_time(member.created_at), inline=True)
         embed.add_field(name='Joined Server', value=self.convert_time(member.joined_at), inline=True)
 
-        member_log = self.bot.get_channel(510555452795518976)
+        member_log = discord.utils.get(
+            self.bot.get_all_channels(),
+            guild__id=339074243838869504,
+            name="member-log",
+        )
         await member_log.send(embed=embed)
 
     @commands.Cog.listener()
@@ -70,7 +73,7 @@ class Mod(commands.Cog):
         member_log = discord.utils.get(
             self.bot.get_all_channels(),
             guild__id=339074243838869504,
-            name="lab-2",
+            name="member-log",
         )
         await member_log.send(embed=embed)
 

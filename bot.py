@@ -8,7 +8,9 @@ import config
 cogs = [
     'cogs.system',
     'cogs.announcements',
+    'cogs.mod',
 ]
+
 
 class Bot(commands.Bot):
     def __init__(self, **kwargs):

@@ -40,7 +40,7 @@ class announcements(commands.Cog):
         self.ann_chan = discord.utils.get(
             self.bot.get_all_channels(),
             guild__id=339074243838869504,
-            name="lab-1",
+            name="announcements",
         )
 
     @tasks.loop(seconds=30)
