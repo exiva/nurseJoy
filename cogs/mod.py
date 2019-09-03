@@ -41,7 +41,7 @@ class Mod(commands.Cog):
     async def on_message(self, message):
         if bool(self.everyonetag.match(message.content)) and not message.channel.permissions_for(message.author).mention_everyone:
             type = re.search(self.everyonetag, message.content)
-            count = len(message.guild.members) if type == '@everyone' else len(message.channel.members)
+            count = len(message.guild.members) if type.group(0) == '@everyone' else len(message.channel.members)
             await message.channel.send(f"I'm sorry, {message.author.mention} I can only heal 6 Pok\U000000e9mon at a time. {count} is too many.")
 
     @commands.Cog.listener()
