@@ -9,12 +9,16 @@ cogs = [
     'cogs.system',
     'cogs.announcements',
     'cogs.mod',
+    'cogs.fuckinghemlock',
+    'cogs.maintenance',
 ]
 
 
 class Bot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(command_prefix='!', **kwargs)
+        self.twitterTokens = config.twitter_tokens
+
         for cog in cogs:
             try:
                 self.load_extension(cog)

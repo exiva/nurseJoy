@@ -16,10 +16,11 @@ class announcements(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.t = PeonyClient(consumer_key='***REMOVED***',
-                             consumer_secret='***REMOVED***',
-                             access_token='***REMOVED***',
-                             access_token_secret='***REMOVED***',
+        self.tokens = bot.twitterTokens
+        self.t = PeonyClient(consumer_key=self.tokens['consumer_key'],
+                             consumer_secret=self.tokens['consumer_secret'],
+                             access_token=self.tokens['access_token'],
+                             access_token_secret=self.tokens['access_secret'],
                              )
         self.twitters = [
             ['PokemonGoApp', False, None],
