@@ -5,7 +5,11 @@ import datetime
 from datetime import timedelta
 from discord.ext import tasks, commands
 import discord
-
+import json
+import io
+import urllib
+import aiohttp
+import polyline
 
 class Maintenance(commands.Cog):
     """
@@ -13,11 +17,14 @@ class Maintenance(commands.Cog):
 
         cleanTrades - Cleans trading post channels and deletes messages older
         than 7 days.
+
+        clearRaidBoards - Cleans raid board channels at midnight.
     """
 
     def __init__(self, bot):
         self.bot = bot
         self.cleantrades.start()
+        # self.clearRaidBoards.start()
 
     def cog_unload(self):
         # clean up logic goes here
@@ -81,6 +88,36 @@ class Maintenance(commands.Cog):
             else:
                 await channel.send("**Note**: This channel will self destruct after the raid has completed. Only use this channel for raid coordination.")
                 await channel.send(f"To get automatically alerted of raids at {message.embeds[0].title} in the future, send `!notify gym {message.embeds[0].title}` in <#{isRaidCat.id}>")
+
+    @commands.command()
+    async def initchannels(self, ctx):
+        raidBoards = filter(
+            lambda ch: ch.name.startswith("\U0001f5bc"), self.bot.get_all_channels()
+        )
+        try:
+            for raidBoard in raidBoards:
+                await raidBoard.purge(bulk=True)
+                with open(f'channels/{raidBoard.id}.json', 'r') as channel:
+                    channelconfig = json.load(channel)
+                    poly = urllib.parse.quote((polyline.encode(channelconfig['bounds'])))
+                    url = "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/path-3+{}-0.5+{}-0.3({})/auto/500x300@2x?access_token=pk.eyJ1IjoiZGl2aW5hdHVtIiwiYSI6ImNrMDkzNWZjdjA0bHgzZG1xN283azV2bTcifQ._RTYtDdjm0pIXINNbQBsHQ".format(channelconfig['color'], channelconfig['color'], poly)
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(url) as resp:
+                            if resp.status != 200:
+                                return print("Couldn't download image.")
+                            img = io.BytesIO(await resp.read())
+
+                            embed = discord.Embed(
+                                title=f"This raid board covers the following regions",
+                                description=channelconfig['regions'],
+                                color=int(channelconfig['color'], 16)
+                                )
+                            embed.set_image(url="attachment://map.png")
+                            sendembed = await raidBoard.send(file=discord.File(img, 'map.png'), embed=embed)
+
+                            await sendembed.pin()
+        except Exception as e:
+            print(f"{e.__class__.__name__} {e}")
 
 def setup(bot):
     bot.add_cog(Maintenance(bot))
