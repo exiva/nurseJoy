@@ -9,6 +9,7 @@ verify_ssl = true
 discord = "*"
 pytz = "*"
 peony-twitter = "*"
+polyline = "*"
 
 [requires]
 python_version = "3.7"
