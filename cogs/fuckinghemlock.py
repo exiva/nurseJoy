@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from discord.ext import commands
+import asyncio
 import discord
 
 
@@ -25,6 +26,7 @@ class fuckingHemlock(commands.Cog):
                 guild__id=339074243838869504,
                 name="welcome",
             )
+            await asyncio.sleep(1)
             await welcomeChannel.edit(position=0)
 
     @commands.Cog.listener()
@@ -36,6 +38,7 @@ class fuckingHemlock(commands.Cog):
                 guild__id=339074243838869504,
                 name="welcome",
             )
+            await asyncio.sleep(1)
             await welcomeChannel.edit(position=0)
 
 
