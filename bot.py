@@ -16,7 +16,7 @@ cogs = [
 
 class Bot(commands.Bot):
     def __init__(self, **kwargs):
-        super().__init__(command_prefix='!', **kwargs)
+        super().__init__(command_prefix=config.prefix, **kwargs)
         self.twitterTokens = config.twitter_tokens
 
         for cog in cogs:
