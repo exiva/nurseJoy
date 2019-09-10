@@ -11,6 +11,7 @@ import urllib
 import aiohttp
 import polyline
 
+
 class Maintenance(commands.Cog):
     """
         Maintaince tasks run by Nurse Joy
@@ -22,6 +23,7 @@ class Maintenance(commands.Cog):
     """
 
     def __init__(self, bot):
+        print(f"Loaded {self.__class__.__name__} cog")
         self.bot = bot
         self.cleantrades.start()
         # self.clearRaidBoards.start()

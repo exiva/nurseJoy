@@ -13,6 +13,7 @@ class Mod(commands.Cog):
     """
 
     def __init__(self, bot):
+        print(f"Loaded {self.__class__.__name__} cog")
         self.bot = bot
         self.everyonetag = re.compile(r"@here|@everyone")
 

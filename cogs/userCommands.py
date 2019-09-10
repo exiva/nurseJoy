@@ -10,7 +10,7 @@ class userCommands(commands.Cog):
     """
 
     def __init__(self, bot):
-        # print(f"Loaded {self.__class__.__name__} cog")
+        print(f"Loaded {self.__class__.__name__} cog")
         self.bot = bot
 
     def cog_unload(self):
