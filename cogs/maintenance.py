@@ -35,10 +35,10 @@ class Maintenance(commands.Cog):
     roles = [role.name for role in ctx.author.roles]
     if 'Admins' in roles:
       return True
-    else:
-      await ctx.send(
-          f"access: PERMISSION DENIED....and...\n {ctx.author.mention} you didn't say the magic word!"
-      )
+    # else:
+      # await ctx.send(
+          # f"access: PERMISSION DENIED....and...\n {ctx.author.mention} you didn't say the magic word!"
+      # )
 
   async def bot_check(self, ctx):
     # checks that apply to every command to the bot

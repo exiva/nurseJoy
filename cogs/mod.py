@@ -25,10 +25,10 @@ class Mod(commands.Cog):
     roles = [role.name for role in ctx.author.roles]
     if 'Admins' in roles or 'Mods' in roles:
       return True
-    else:
-      await ctx.send(
-          f"access: PERMISSION DENIED....and...\n {ctx.author.mention} you didn't say the magic word!"
-      )
+    # else:
+      # await ctx.send(
+          # f"access: PERMISSION DENIED....and...\n {ctx.author.mention} you didn't say the magic word!"
+      # )
 
   async def cog_after_invoke(self, ctx):
     # called after a command is called here
