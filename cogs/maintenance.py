@@ -81,7 +81,7 @@ class Maintenance(commands.Cog):
   @commands.Cog.listener()
   async def on_guild_channel_create(self, channel):
     isRaidCat = discord.utils.find(
-        lambda c: c.name.startswith("🖼"), channel.category.channels
+        lambda c: c.name.startswith("\U0001f5bc"), channel.category.channels
     )
 
     def isHemlock(msg):
