@@ -8,80 +8,83 @@ from peony import PeonyClient
 
 
 class announcements(commands.Cog):
-    """Announcements cog
+  """Announcements cog
 
        Posts Tweet announcements, and version forces
 
     """
+  def __init__(self, bot):
+    print(f"Loaded {self.__class__.__name__} cog")
+    self.bot = bot
+    self.tokens = bot.twitterTokens
+    self.t = PeonyClient(
+        consumer_key=self.tokens['consumer_key'],
+        consumer_secret=self.tokens['consumer_secret'],
+        access_token=self.tokens['access_token'],
+        access_token_secret=self.tokens['access_secret'],
+    )
+    self.twitters = [
+        ['PokemonGoApp', False, None],
+        ['chrales', True, None],
+    ]
+    self.currentVersion = "0.0.0"
+    self.checkTweets.start()
+    self.checkVersionForce.start()
 
-    def __init__(self, bot):
-        print(f"Loaded {self.__class__.__name__} cog")
-        self.bot = bot
-        self.tokens = bot.twitterTokens
-        self.t = PeonyClient(consumer_key=self.tokens['consumer_key'],
-                             consumer_secret=self.tokens['consumer_secret'],
-                             access_token=self.tokens['access_token'],
-                             access_token_secret=self.tokens['access_secret'],
-                             )
-        self.twitters = [
-            ['PokemonGoApp', False, None],
-            ['chrales', True, None],
-            ]
-        self.currentVersion = "0.0.0"
-        self.checkTweets.start()
-        self.checkVersionForce.start()
+  def cog_unload(self):
+    print("Unloading announcements cog...")
+    self.checkTweets.cancel()
+    self.checkVersionForce.cancel()
+    pass
 
-    def cog_unload(self):
-        print("Unloading announcements cog...")
-        self.checkTweets.cancel()
-        self.checkVersionForce.cancel()
-        pass
+  @commands.Cog.listener()
+  async def on_ready(self):
+    self.ann_chan = discord.utils.get(
+        self.bot.get_all_channels(),
+        guild__id=339074243838869504,
+        name="announcements",
+    )
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.ann_chan = discord.utils.get(
-            self.bot.get_all_channels(),
-            guild__id=339074243838869504,
-            name="announcements",
-        )
+  @tasks.loop(seconds=30)
+  async def checkTweets(self):
+    for user in self.twitters:
+      tweets = await self.t.api.statuses.user_timeline.get(screen_name=user[0], count=1)
+      tweet = tweets[0]
+      if not user[2]:
+        user[2] = tweet.id_str
+      elif user[2] != tweet.id_str and tweet.in_reply_to_screen_name in (None, user[0]):
+        msg = f"https://twitter.com/{user[0]}/status/{tweet.id_str}"
+        if user[1]:  # Spoiler tweet
+          msg = f"|| {msg} ||"
+        await self.ann_chan.send(msg)
+      user[2] = tweet.id_str
 
-    @tasks.loop(seconds=30)
-    async def checkTweets(self):
-        for user in self.twitters:
-            tweets = await self.t.api.statuses.user_timeline.get(screen_name=user[0], count=1)
-            tweet = tweets[0]
-            if not user[2]:
-                user[2] = tweet.id_str
-            elif user[2] != tweet.id_str and tweet.in_reply_to_screen_name in (None, user[0]):
-                msg = f"https://twitter.com/{user[0]}/status/{tweet.id_str}"
-                if user[1]:  # Spoiler tweet
-                    msg = f"|| {msg} ||"
-                await self.ann_chan.send(msg)
-            user[2] = tweet.id_str
+  @checkTweets.after_loop
+  async def on_checkTweets_cancel(self):
+    await self.t.close()
 
-    @checkTweets.after_loop
-    async def on_checkTweets_cancel(self):
-        await self.t.close()
+  @tasks.loop(minutes=5)
+  async def checkVersionForce(self):
+    async with aiohttp.ClientSession() as session:
+      async with session.get("https://pgorelease.nianticlabs.com/plfe/version") as resp:
+        version = await resp.text('utf-8')
+        version = version[2:]
+        if self.currentVersion != "0.0.0" and StrictVersion(self.currentVersion
+                                                           ) < StrictVersion(version):
+          await self.ann_chan.send(
+              f"Pokemon Go update forced to version {version}. Check for updates in your App Store."
+          )
+        self.currentVersion = version
 
-    @tasks.loop(minutes=5)
-    async def checkVersionForce(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://pgorelease.nianticlabs.com/plfe/version") as resp:
-                version = await resp.text('utf-8')
-                version = version[2:]
-                if self.currentVersion != "0.0.0" and StrictVersion(self.currentVersion) < StrictVersion(version):
-                    await self.ann_chan.send(f"Pokemon Go update forced to version {version}. Check for updates in your App Store.")
-                self.currentVersion = version
+  # wait for bot to connect before starting tasks
+  @checkTweets.before_loop
+  async def before_checktweets(self):
+    await self.bot.wait_until_ready()
 
-    # wait for bot to connect before starting tasks
-    @checkTweets.before_loop
-    async def before_checktweets(self):
-        await self.bot.wait_until_ready()
-
-    @checkVersionForce.before_loop
-    async def before_checkVersionForce(self):
-        await self.bot.wait_until_ready()
+  @checkVersionForce.before_loop
+  async def before_checkVersionForce(self):
+    await self.bot.wait_until_ready()
 
 
 def setup(bot):
-    bot.add_cog(announcements(bot))
+  bot.add_cog(announcements(bot))

@@ -15,19 +15,23 @@ cogs = [
 
 
 class Bot(commands.Bot):
-    def __init__(self, **kwargs):
-        super().__init__(command_prefix=config.prefix, **kwargs)
-        self.twitterTokens = config.twitter_tokens
+  def __init__(self, **kwargs):
+    super().__init__(command_prefix=config.prefix, **kwargs)
+    self.twitterTokens = config.twitter_tokens
 
-        for cog in cogs:
-            try:
-                self.load_extension(cog)
-            except Exception as exc:
-                print('Could not load extension {0} due to {1.__class__.__name__}: {1}'.format(cog, exc))
+    for cog in cogs:
+      try:
+        self.load_extension(cog)
+      except Exception as exc:
+        print(
+            'Could not load extension {0} due to {1.__class__.__name__}: {1}'.format(
+                cog, exc
+            )
+        )
 
-    async def on_ready(self):
-        print('Logged on as {0} (ID: {0.id})'.format(self.user))
-        await bot.change_presence(activity=discord.Game(name='at the Pokémon Center!'))
+  async def on_ready(self):
+    print('Logged on as {0} (ID: {0.id})'.format(self.user))
+    await bot.change_presence(activity=discord.Game(name='at the Pokémon Center!'))
 
 
 bot = Bot()
