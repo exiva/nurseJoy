@@ -1,75 +1,90 @@
 # -*- coding: utf-8 -*-
 
-import asyncio
+import aiohttp
 import discord
-import urllib.request
-from discord.ext import commands
+from discord.ext import tasks, commands
 from distutils.version import StrictVersion
-from twitter import *
+from peony import PeonyClient
 
 
-class annoncements(commands.Cog):
-    """Announcements cog
+class announcements(commands.Cog):
+  """Announcements cog
 
        Posts Tweet announcements, and version forces
 
     """
+  def __init__(self, bot):
+    print(f"Loaded {self.__class__.__name__} cog")
+    self.bot = bot
+    self.tokens = bot.twitterTokens
+    self.t = PeonyClient(
+        consumer_key=self.tokens['consumer_key'],
+        consumer_secret=self.tokens['consumer_secret'],
+        access_token=self.tokens['access_token'],
+        access_token_secret=self.tokens['access_secret'],
+    )
+    self.twitters = [
+        ['PokemonGoApp', False, None],
+        ['chrales', True, None],
+    ]
+    self.currentVersion = "0.0.0"
+    self.checkTweets.start()
+    self.checkVersionForce.start()
 
-    def __init__(self, bot):
-        self.bot = bot
-        self.t = Twitter(auth=OAuth(
-                '630713-FUwZlUfwULM9OecKcCvFekk1t95YMk8KUC6Wl58IcAz',
-                'zk8iIm8bft1OTm3C9TDjLnIwUP0TnPUk7uVNNppu43MLg',
-                'O39ryCasRdZsyx2LYZIMq8Dnm',
-                'MpiRNC0CaUGpZjwmFqdgrF6pFcvuVzDFQcey5h5Sm6kBvXIm51'))
-        self.twitters = [
-            ['PokemonGoApp', False, None],
-            ['chrales', True, None]
-            ]
-        self.currentVersion = "0.0.0"
+  def cog_unload(self):
+    print("Unloading announcements cog...")
+    self.checkTweets.cancel()
+    self.checkVersionForce.cancel()
+    pass
 
-    def cog_unload(self):
-        print("Unloading announcements module...")
-        self.tweetTask.cancel()
-        self.versionTask.cancel()
+  @commands.Cog.listener()
+  async def on_ready(self):
+    self.ann_chan = discord.utils.get(
+        self.bot.get_all_channels(),
+        guild__id=339074243838869504,
+        name="announcements",
+    )
 
-        pass
+  @tasks.loop(seconds=30)
+  async def checkTweets(self):
+    for user in self.twitters:
+      tweets = await self.t.api.statuses.user_timeline.get(screen_name=user[0], count=1)
+      tweet = tweets[0]
+      if not user[2]:
+        user[2] = tweet.id_str
+      elif user[2] != tweet.id_str and tweet.in_reply_to_screen_name in (None, user[0]):
+        msg = f"https://twitter.com/{user[0]}/status/{tweet.id_str}"
+        if user[1]:  # Spoiler tweet
+          msg = f"|| {msg} ||"
+        await self.ann_chan.send(msg)
+      user[2] = tweet.id_str
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.announcements = self.bot.get_channel(345910796016156676)
-        self.tweetTask = self.bot.loop.create_task(self.checkTweets())
-        self.versionTask = self.bot.loop.create_task(self.checkVersionForce())
+  @checkTweets.after_loop
+  async def on_checkTweets_cancel(self):
+    await self.t.close()
 
-    async def checkTweets(self):
-        try:
-            while not self.bot.is_closed():
-                for user in self.twitters:
-                    tweets = self.t.statuses.user_timeline(screen_name="PokemonGoApp")
-                    if not user[2]:
-                        user[2] = tweets[0]['id_str']
-                    elif user[2] != tweets[0]['id_str'] and tweets[0]['in_reply_to_screen_name'] is None:
-                        msg = f"https://twitter.com/{user[0]}/status/{tweets[0]['id_str']}"
-                        if user[1]:  # Spoiler tweet
-                            msg = f"|| {msg} ||"
-                        await self.announcements.send(msg)
-                    user[2] = tweets[0]['id_str']
-                await asyncio.sleep(30)
-        except Exception as e:
-            print(e)
+  @tasks.loop(minutes=5)
+  async def checkVersionForce(self):
+    async with aiohttp.ClientSession() as session:
+      async with session.get("https://pgorelease.nianticlabs.com/plfe/version") as resp:
+        version = await resp.text('utf-8')
+        version = version[2:]
+        if self.currentVersion != "0.0.0" and StrictVersion(self.currentVersion
+                                                           ) < StrictVersion(version):
+          await self.ann_chan.send(
+              f"Pokemon Go update forced to version {version}. Check for updates in your App Store."
+          )
+        self.currentVersion = version
 
-    async def checkVersionForce(self):
-        try:
-            while not self.bot.is_closed():
-                with urllib.request.urlopen('https://pgorelease.nianticlabs.com/plfe/version') as version:
-                    version = version.read().decode('utf-8')[2:]
-                    if self.currentVersion != "0.0.0" and StrictVersion(self.currentVersion) < StrictVersion(version):
-                        await self.announcements.send(f"Pokemon Go update forced to version {version}. Check for updates in your App Store.")
-                    self.currentVersion = version
-                    await asyncio.sleep(300)
-        except Exception as e:
-            print(e)
+  # wait for bot to connect before starting tasks
+  @checkTweets.before_loop
+  async def before_checktweets(self):
+    await self.bot.wait_until_ready()
+
+  @checkVersionForce.before_loop
+  async def before_checkVersionForce(self):
+    await self.bot.wait_until_ready()
 
 
 def setup(bot):
-    bot.add_cog(annoncements(bot))
+  bot.add_cog(announcements(bot))
