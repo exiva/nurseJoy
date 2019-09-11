@@ -29,6 +29,7 @@ class Maintenance(commands.Cog):
     self.clearRaidBoards.start()
 
   def cog_unload(self):
+    self.cleantrades.cancel()()
     self.bottomPinned.cancel()
     self.clearRaidBoards.cancel()
     # clean up logic goes here
@@ -103,7 +104,7 @@ class Maintenance(commands.Cog):
               f"Please **only** use this channel for posting in-game screenshots of gyms with raid eggs/bosses or commands for raids, and keep chat in the appropriate raid channel or <#{chatChannel.id}>.\n\nMap screenshots do not work with the Raid bot. To start a raid manually type `!raid Tier Number or Boss Gym Name`"
           )
 
-  @tasks.loop(time=datetime.time(hour=0, minute=0))
+  @tasks.loop(time=datetime.time(hour=4, minute=0))
   async def clearRaidBoards(self):
     print("Clearing raid boards")
     raidBoards = filter(
