@@ -25,9 +25,10 @@ class Maintenance(commands.Cog):
     print(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
     self.cleantrades.start()
-    # self.clearRaidBoards.start()
+    self.bottomPinned.start()
 
   def cog_unload(self):
+    self.bottomPinned.cancel()
     # clean up logic goes here
     pass
 
@@ -78,6 +79,27 @@ class Maintenance(commands.Cog):
   async def before_cleantrades(self):
     await self.bot.wait_until_ready()
 
+  @tasks.loop(seconds=10)
+  async def bottomPinned(self):
+    raidBoards = filter(
+        lambda ch: ch.name.startswith("\U0001f5bc"), self.bot.get_all_channels()
+    )
+
+    def deleteCheck(m):
+      if m.author == self.bot.user and not m.pinned:
+        return True
+
+    for raidBoard in raidBoards:
+      messages = await raidBoard.history(limit=1).flatten()
+      for m in messages:
+        if m.author != self.bot.user:
+          chatChannel = discord.utils.find(
+              lambda c: c.name.endswith("-chat"), raidBoard.category.channels
+          )
+          await raidBoard.purge(limit=100, check=deleteCheck)
+          await raidBoard.send(
+              f"Please **only** use this channel for posting in-game screenshots of gyms with raid eggs/bosses or commands for raids, and keep chat in the appropriate raid channel or <#{chatChannel.id}>.\n\nMap screenshots do not work with the Raid bot. To start a raid manually type `!raid Tier Number or Boss Gym Name`"
+          )
   @commands.Cog.listener()
   async def on_guild_channel_create(self, channel):
     isRaidCat = discord.utils.find(
