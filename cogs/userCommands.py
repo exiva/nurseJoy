@@ -72,6 +72,17 @@ class userCommands(commands.Cog):
           delete_after=1 * 60
       )
 
+  @commands.command()
+  async def invite(self, ctx):
+    first_chan = ctx.guild.text_channels[0]
+    invite = await first_chan.create_invite(
+        max_age=24 * 3600, reason=f"Requested by {ctx.message.author}"
+    )
+    await ctx.send(
+        content=f"Here's your invite, {ctx.message.author.mention}. {invite}",
+        delete_after=5 * 60
+    )
+
 
 def setup(bot):
   bot.add_cog(userCommands(bot))
