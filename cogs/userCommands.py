@@ -38,7 +38,8 @@ class userCommands(commands.Cog):
     pass
 
   async def cog_after_invoke(self, ctx):
-    # called after a command is called here
+    await asyncio.sleep(1 * 60)
+    await ctx.message.delete()
     pass
 
   @commands.command()
@@ -51,25 +52,36 @@ class userCommands(commands.Cog):
     if teamName.lower() in teams:
       for u_role in roles:
         if u_role in teams:
-          reply = await ctx.send(
-              f"Sorry {ctx.message.author.mention}, but you're already assigned to a team."
+          await ctx.send(
+              content=
+              f"Sorry {ctx.message.author.mention}, but you're already assigned to a team.",
+              delete_after=1 * 60
           )
-          await asyncio.sleep(10)
-          await ctx.message.delete()
-          await reply.delete()
           return
 
       await ctx.message.author.add_roles(role)
-      reply = await ctx.send(
-          f"{ctx.message.author.mention} I've set your team to {teamName.capitalize()}."
+      await ctx.send(
+          content=
+          f"{ctx.message.author.mention} I've set your team to {teamName.capitalize()}.",
+          delete_after=1 * 60
       )
-      await asyncio.sleep(10)
-      await ctx.message.delete()
-      await reply.delete()
     else:
       await ctx.send(
-          f"Sorry {ctx.message.author.mention}, `{teamName}` is not a valid team choice. Try again with `{ctx.prefix}{ctx.invoked_with} {', '.join(teams)}`"
+          content=
+          f"Sorry {ctx.message.author.mention}, `{teamName}` is not a valid team choice. Try again with `{ctx.prefix}{ctx.invoked_with} {', '.join(teams)}`",
+          delete_after=1 * 60
       )
+
+  @commands.command()
+  async def invite(self, ctx):
+    first_chan = ctx.guild.text_channels[0]
+    invite = await first_chan.create_invite(
+        max_age=24 * 3600, reason=f"Requested by {ctx.message.author}"
+    )
+    await ctx.send(
+        content=f"Here's your invite, {ctx.message.author.mention}. {invite}",
+        delete_after=5 * 60
+    )
 
 
 def setup(bot):
