@@ -64,11 +64,11 @@ class System(commands.Cog):
   @commands.command()
   async def clear(self, ctx):
     msg = await ctx.send(f"Would you really like to clear **all** messages?")
-    await msg.add_reaction('👍')
-    await msg.add_reaction('👎')
+    await msg.add_reaction('\U0001F44D')
+    await msg.add_reaction('\U0001F44E')
 
     def check(reaction, user):
-      return user == ctx.message.author and str(reaction.emoji) == '�'
+      return user == ctx.message.author and str(reaction.emoji) == '\U0001F44D'
 
     try:
       reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=5.0)
@@ -83,11 +83,11 @@ class System(commands.Cog):
     msg = await ctx.send(
         f"Would you really like to clear everything but pinned messages?"
     )
-    await msg.add_reaction('👍')
-    await msg.add_reaction('👎')
+    await msg.add_reaction('\U0001F44D')
+    await msg.add_reaction('\U0001F44E')
 
     def check(reaction, user):
-      return user == ctx.message.author and str(reaction.emoji) == '�'
+      return user == ctx.message.author and str(reaction.emoji) == '\U0001F44D'
 
     def deleteCheck(message):
       return not message.pinned
