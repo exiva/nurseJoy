@@ -36,8 +36,9 @@ class Bot(commands.Bot):
     await bot.change_presence(activity=discord.Game(name='at the Pokémon Center!'))
 
   async def on_command_error(self, ctx, error):
-      if isinstance(error, CommandNotFound):
-          pass
+    if isinstance(error, CommandNotFound):
+      pass
+
 
 bot = Bot()
 bot.run(config.token)
