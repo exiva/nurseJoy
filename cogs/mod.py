@@ -98,8 +98,8 @@ class Mod(commands.Cog):
           action=discord.AuditLogAction.ban, limit=1
       ).flatten()
       embed.add_field(name='Banned By', value=auditLog[0].user)
-    if banned.reason:
-      embed.add_field(name='Ban Reason', value=banned.reason)
+      if banned.reason:
+        embed.add_field(name='Ban Reason', value=banned.reason)
 
     member_log = discord.utils.get(
         self.bot.get_all_channels(),
