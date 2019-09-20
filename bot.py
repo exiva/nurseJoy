@@ -3,6 +3,7 @@
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import CommandNotFound
 import config
 
 cogs = [
@@ -33,6 +34,9 @@ class Bot(commands.Bot):
     print('Logged on as {0} (ID: {0.id})'.format(self.user))
     await bot.change_presence(activity=discord.Game(name='at the Pokémon Center!'))
 
+  async def on_command_error(self, ctx, error):
+      if isinstance(error, CommandNotFound):
+          pass
 
 bot = Bot()
 bot.run(config.token)
