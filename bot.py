@@ -12,6 +12,7 @@ cogs = [
     'cogs.mod',
     'cogs.fuckinghemlock',
     'cogs.maintenance',
+    'cogs.userCommands',
 ]
 
 
