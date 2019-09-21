@@ -7,6 +7,7 @@ import pytz
 from discord.ext import commands
 from datetime import datetime
 import discord
+import subprocess
 
 
 class System(commands.Cog):
@@ -60,6 +61,21 @@ class System(commands.Cog):
     await ctx.send("Shutting down.")
     await self.bot.logout()
 
+  @commands.command()
+  async def reloadall(self, ctx):
+    cogs = [cog.__module__.split('.')[1] for cog in self.bot.cogs.values()]
+    for cog in cogs:
+      try:
+        self.bot.unload_extension(f"cogs.{cog}")
+        self.bot.load_extension(f"cogs.{cog}")
+      except Exception as e:
+        await ctx.send(f"Error loading {cog}: {e}")
+    await ctx.send()
+
+  @commands.command()
+  async def update(self, ctx):
+    result = subprocess.check_output(['git', 'pull'])
+    await ctx.send(result.decode('utf-8'))
 
   @commands.command()
   async def clear(self, ctx):
