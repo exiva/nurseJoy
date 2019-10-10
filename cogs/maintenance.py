@@ -142,9 +142,10 @@ class Maintenance(commands.Cog):
         await channel.send(
             "**Note**: This channel will self destruct after the raid has completed. Only use this channel for raid coordination."
         )
-        await channel.send(
-            f"To get automatically alerted of raids at {message.embeds[0].title} in the future, send `!notify gym {message.embeds[0].title}` in <#{isRaidCat.id}>"
-        )
+        if message.embeds[0].title is not discord.Embed.Empty:
+          await channel.send(
+              f"To get automatically alerted of raids at {message.embeds[0].title} in the future, send `!notify gym {message.embeds[0].title}` in <#{isRaidCat.id}>"
+          )
 
   @commands.command()
   async def initchannels(self, ctx):
