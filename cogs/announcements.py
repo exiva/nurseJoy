@@ -5,6 +5,7 @@ import discord
 from discord.ext import tasks, commands
 from distutils.version import StrictVersion
 from peony import PeonyClient
+from peony.exceptions import PeonyException
 
 
 class announcements(commands.Cog):
@@ -48,16 +49,21 @@ class announcements(commands.Cog):
   @tasks.loop(seconds=30)
   async def checkTweets(self):
     for user in self.twitters:
-      tweets = await self.t.api.statuses.user_timeline.get(screen_name=user[0], count=1)
-      tweet = tweets[0]
-      if not user[2]:
+      try:
+        tweets = await self.t.api.statuses.user_timeline.get(screen_name=user[0], count=1)
+        tweet = tweets[0]
+        if not user[2]:
+          user[2] = tweet.id_str
+        elif user[2] != tweet.id_str and tweet.in_reply_to_screen_name in (None, user[0]):
+          msg = f"https://twitter.com/{user[0]}/status/{tweet.id_str}"
+          if user[1]:  # Spoiler tweet
+            msg = f"|| {msg} ||"
+          await self.ann_chan.send(msg)
         user[2] = tweet.id_str
-      elif user[2] != tweet.id_str and tweet.in_reply_to_screen_name in (None, user[0]):
-        msg = f"https://twitter.com/{user[0]}/status/{tweet.id_str}"
-        if user[1]:  # Spoiler tweet
-          msg = f"|| {msg} ||"
-        await self.ann_chan.send(msg)
-      user[2] = tweet.id_str
+      except PeonyException:
+        print("twitter exception")
+      except Exception as e:
+        print(f"Something else happened: {e}")
 
   @checkTweets.after_loop
   async def on_checkTweets_cancel(self):
