@@ -15,7 +15,7 @@ class Mod(commands.Cog):
   def __init__(self, bot):
     print(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
-    self.everyonetag = re.compile(r"@here|@everyone")
+    self.everyonetag = re.compile(r"@here|@everyone", re.IGNORECASE)
 
   def cog_unload(self):
     # clean up logic goes here
@@ -26,9 +26,9 @@ class Mod(commands.Cog):
     if 'Admins' in roles or 'Mods' in roles:
       return True
     # else:
-      # await ctx.send(
-          # f"access: PERMISSION DENIED....and...\n {ctx.author.mention} you didn't say the magic word!"
-      # )
+    # await ctx.send(
+    # f"access: PERMISSION DENIED....and...\n {ctx.author.mention} you didn't say the magic word!"
+    # )
 
   async def cog_after_invoke(self, ctx):
     # called after a command is called here
@@ -42,7 +42,7 @@ class Mod(commands.Cog):
 
   @commands.Cog.listener()
   async def on_message(self, message):
-    if bool(self.everyonetag.match(message.content)
+    if bool(re.search(self.everyonetag, message.content)
            ) and not message.channel.permissions_for(message.author).mention_everyone:
       type = re.search(self.everyonetag, message.content)
       count = len(message.guild.members
