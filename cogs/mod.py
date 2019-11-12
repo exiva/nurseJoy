@@ -55,6 +55,7 @@ class Mod(commands.Cog):
   async def on_message_delete(self, message):
     embed = discord.Embed(title='Message Deleted', color=discord.Colour.red())
     embed.add_field(name='Deleted By', value=message.author)
+    embed.add_field(name='Deleted From', value=message.channel.name, inline=True)
     embed.add_field(name='Message Content', value=message.content, inline=False)
     embed.set_thumbnail(url='https://i.imgur.com/bKeMCyG.png')
     delete_log = discord.utils.get(
