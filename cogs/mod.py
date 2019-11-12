@@ -52,6 +52,19 @@ class Mod(commands.Cog):
       )
 
   @commands.Cog.listener()
+  async def on_message_delete(self, message):
+    embed = discord.Embed(title='Message Deleted', color=discord.Colour.red())
+    embed.add_field(name='Deleted By', value=message.author)
+    embed.add_field(name='Message Content', value=message.content, inline=False)
+    embed.set_thumbnail(url='https://i.imgur.com/bKeMCyG.png')
+    delete_log = discord.utils.get(
+        self.bot.get_all_channels(),
+        guild__id=339074243838869504,
+        name="delete-log",
+    )
+    await delete_log.send(embed=embed)
+
+  @commands.Cog.listener()
   async def on_member_join(self, member):
     embed = discord.Embed(title="New Member", color=int("86eef0", 16))
     embed.set_thumbnail(url=member.avatar_url)
