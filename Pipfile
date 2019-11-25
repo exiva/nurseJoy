@@ -4,9 +4,13 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pylint = "*"
+yapf = "*"
 
 [packages]
-discord = {git = "https://github.com/Rapptz/discord.py"}
+# temporarily switch to ext-tasks branch of discord.py
+# discord = {git = "https://github.com/Rapptz/discord.py"}
+discordtasks = {git = "https://github.com/Rapptz/discord.py",ref = "feature/ext-tasks"}
 pytz = "*"
 peony-twitter = "*"
 polyline = "*"
