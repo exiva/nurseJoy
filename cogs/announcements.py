@@ -8,7 +8,7 @@ from peony import PeonyClient
 from peony.exceptions import PeonyException
 import math
 import time
-from datetime import datetime
+import datetime
 
 class announcements(commands.Cog):
   """Announcements cog
