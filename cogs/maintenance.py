@@ -146,7 +146,8 @@ class Maintenance(commands.Cog):
           await channel.send(
               f"To get automatically alerted of raids at {message.embeds[0].title} in the future, send `!notify gym {message.embeds[0].title}` in <#{isRaidCat.id}>"
           )
-
+        await channel.send("__**COVID-19 Warning**__\nDuring the COVID-19 pandemic, please keep raid groups as small as possible. Practice social distancing staying 4 to 6 feet apart from each other if you cannot stay in vehicles during raids. Make use of the voice chat channels to keep distance from others. If you have any symptoms, stay home, Pokémon isn't worth spreading the virus.\n\nUpdates on the New York state of health can be found here https://www.health.ny.gov/diseases/communicable/coronavirus/")
+  
   @commands.command()
   async def initchannels(self, ctx):
     raidBoards = filter(
