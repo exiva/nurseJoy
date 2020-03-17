@@ -210,7 +210,7 @@ class Mod(commands.Cog):
               filename = attachment.filename
               await c.send(content=message, file=discord.File(img, filename))
       else:
-      await c.send(content=message)
+        await c.send(content=message)
 
 
 def setup(bot):
