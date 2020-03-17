@@ -197,6 +197,11 @@ class Mod(commands.Cog):
 
     await ctx.send(embed=embed)
 
+  @commands.command()
+  async def say(self, ctx, channel: commands.Greedy[discord.TextChannel], *, message: str):
+    for c in channel:
+      await c.send(content=message)
+
 
 def setup(bot):
   bot.add_cog(Mod(bot))
