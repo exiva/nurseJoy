@@ -200,6 +200,16 @@ class Mod(commands.Cog):
   @commands.command()
   async def say(self, ctx, channel: commands.Greedy[discord.TextChannel], *, message: str):
     for c in channel:
+      if ctx.message.attachments:
+        async with aiohttp.ClientSession() as session:
+          for attachment in ctx.message.attachments:
+            async with session.get(attachment.proxy_url) as resp:
+              if resp.status != 200:
+                return print("Couldn't download image.")
+              img = io.BytesIO(await resp.read())
+              filename = attachment.filename
+              await c.send(content=message, file=discord.File(img, filename))
+      else:
       await c.send(content=message)
 
 
