@@ -5,6 +5,7 @@ from discord.ext import commands
 from datetime import datetime
 import discord
 import re
+import io
 
 
 class Mod(commands.Cog):
@@ -201,6 +202,7 @@ class Mod(commands.Cog):
   async def say(self, ctx, channel: commands.Greedy[discord.TextChannel], *, message: str):
     for c in channel:
       if ctx.message.attachments:
+        files = []
         async with aiohttp.ClientSession() as session:
           for attachment in ctx.message.attachments:
             async with session.get(attachment.proxy_url) as resp:
@@ -208,7 +210,8 @@ class Mod(commands.Cog):
                 return print("Couldn't download image.")
               img = io.BytesIO(await resp.read())
               filename = attachment.filename
-              await c.send(content=message, file=discord.File(img, filename))
+              files.append(discord.File(img, filename))
+        await c.send(content=message, files=files)
       else:
         await c.send(content=message)
 
