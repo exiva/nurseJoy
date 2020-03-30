@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import aiohttp
 import pytz
 from discord.ext import commands
 from datetime import datetime
