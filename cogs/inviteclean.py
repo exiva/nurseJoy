@@ -48,5 +48,17 @@ class Inviteclean(commands.Cog):
             if invite.guild.id not in self.allowedDiscords:
                 await message.delete()
 
+    @commands.Cog.listener()
+    async def on_raw_message_edit(self, payload):
+        channel = self.bot.get_channel(int(payload.data["channel_id"]))
+        if 'content' in payload.data:
+            finding = re.findall(self.inviteurl, payload.data['content'])
+            for find in finding:
+                invite = await self.bot.fetch_invite(find, with_counts=False)
+                if invite.guild.id not in self.allowedDiscords:
+                    message = await channel.fetch_message(payload.message_id)
+                    await message.delete()
+
+
 def setup(bot):
     bot.add_cog(Inviteclean(bot))
