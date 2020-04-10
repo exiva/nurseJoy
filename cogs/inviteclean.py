@@ -9,6 +9,8 @@ class Inviteclean(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.inviteurl = re.compile(r"(?:https?://)?(?:www\.)?(?:discord(?:\.| |\[?\(?\"?'?dot'?\"?\)?\]?)?(?:gg|io|me|li)|discordapp\.com/invite)/+((?:(?!https?)[\w\d-])+)", flags=re.IGNORECASE)
+        self.allowedDiscords = [339074243838869504, 261360369681956864, 237964415822069760, 201304964495048704]
 
     def cog_unload(self):
         # clean up logic goes here
@@ -40,11 +42,10 @@ class Inviteclean(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        inviteurl = re.compile(r"(discord.gg|discordapp.com/invite|discord.me)(\S+)")
-        allowedDiscords = [339074243838869504, 261360369681956864, 237964415822069760, 201304964495048704]
-        for finding in inviteurl.finditer(message.content):
-            invite = await self.bot.fetch_invite(finding.string, with_counts=False)
-            if invite.guild.id not in allowedDiscords:
+        finding = re.findall(self.inviteurl, message.content)
+        for find in finding:
+            invite = await self.bot.fetch_invite(find, with_counts=False)
+            if invite.guild.id not in self.allowedDiscords:
                 await message.delete()
 
 def setup(bot):
