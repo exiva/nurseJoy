@@ -9,7 +9,7 @@ class Inviteclean(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.inviteurl = re.compile(r"(?:https?://)?(?:www\.)?(?:discord(?:\.| |\[?\(?\"?'?dot'?\"?\)?\]?)?(?:gg|io|me|li)|discordapp\.com/invite)/+((?:(?!https?)[\w\d-])+)", flags=re.IGNORECASE)
+        self.inviteurl = re.compile(r"(?:https?://)?(?:www\.)?(?:discord(?:\.| |\[?\(?\"?'?dot'?\"?\)?\]?)?(?:gg|io|me|li)|discordapp\.com/invite)/|silph\.gg/t/+((?:(?!https?)[\w\d-])+)", flags=re.IGNORECASE)
         self.allowedDiscords = [339074243838869504, 261360369681956864, 237964415822069760, 201304964495048704]
 
     def cog_unload(self):
@@ -44,20 +44,28 @@ class Inviteclean(commands.Cog):
     async def on_message(self, message):
         finding = re.findall(self.inviteurl, message.content)
         for find in finding:
-            invite = await self.bot.fetch_invite(find, with_counts=False)
-            if invite.guild.id not in self.allowedDiscords:
+            try:
+                invite = await self.bot.fetch_invite(find, with_counts=False)
+            except discord.errors.NotFound:
                 await message.delete()
+            finally:
+                if invite.guild.id not in self.allowedDiscords:
+                    await message.delete()
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
         channel = self.bot.get_channel(int(payload.data["channel_id"]))
+        message = await channel.fetch_message(payload.message_id)
         if 'content' in payload.data:
             finding = re.findall(self.inviteurl, payload.data['content'])
             for find in finding:
-                invite = await self.bot.fetch_invite(find, with_counts=False)
-                if invite.guild.id not in self.allowedDiscords:
-                    message = await channel.fetch_message(payload.message_id)
+                try:
+                    invite = await self.bot.fetch_invite(find, with_counts=False)
+                except discord.errors.NotFound:
                     await message.delete()
+                finally:
+                    if invite.guild.id not in self.allowedDiscords:                        
+                        await message.delete()
 
 
 def setup(bot):
