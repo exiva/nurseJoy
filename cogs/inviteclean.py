@@ -9,7 +9,7 @@ class Inviteclean(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.inviteurl = re.compile(r"(?:https?://)?(?:www\.)?(?:discord(?:\.| |\[?\(?\"?'?dot'?\"?\)?\]?)?(?:gg|io|me|li)|discordapp\.com/invite)/|silph\.gg/t/+((?:(?!https?)[\w\d-])+)", flags=re.IGNORECASE)
+        self.inviteurl = re.compile(r"(?:https?://)?(?:www\.)?(?:discord(?:\.| |\[?\(?\"?'?dot'?\"?\)?\]?)?(?:gg|io|me|li)|discordapp\.com/invite|silph.gg/t)/+((?:(?!https?)[\w\d-])+)", flags=re.IGNORECASE)
         self.allowedDiscords = [339074243838869504, 261360369681956864, 237964415822069760, 201304964495048704]
 
     def cog_unload(self):
@@ -64,7 +64,7 @@ class Inviteclean(commands.Cog):
                 except discord.errors.NotFound:
                     await message.delete()
                 finally:
-                    if invite.guild.id not in self.allowedDiscords:                        
+                    if invite.guild.id not in self.allowedDiscords:
                         await message.delete()
 
 
