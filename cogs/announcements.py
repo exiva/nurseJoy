@@ -51,10 +51,12 @@ class announcements(commands.Cog):
         name="announcements",
     )
 
-  @tasks.loop(time=datetime.time(hour=23, minute=0))
-  async def nestsRotated(self):
-    if math.floor((time.time() - 1582693200) / 86400) % 14 == 0:
-      await self.ann_chan.send("Nests have migrated! Report new sightings on <http://thesilphroad.com/atlas>")
+  #todo: fix this. posts multiple times, and on the wrong week.
+  
+  # @tasks.loop(time=datetime.time(hour=23, minute=0))
+  # async def nestsRotated(self):
+  #   if math.floor((time.time() - 1582693200) / 86400) % 14 == 0:
+  #     await self.ann_chan.send("Nests have migrated! Report new sightings on <http://thesilphroad.com/atlas>")
 
   @tasks.loop(seconds=30)
   async def checkTweets(self):
