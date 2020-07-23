@@ -104,24 +104,30 @@ class Maintenance(commands.Cog):
               f"Please **only** use this channel for posting in-game screenshots of gyms with raid eggs/bosses or commands for raids, and keep chat in the appropriate raid channel or <#{chatChannel.id}>.\n\nMap screenshots do not work with the Raid bot. To start a raid manually type `!raid Tier Number or Boss Gym Name`"
           )
 
-  @tasks.loop(time=datetime.time(hour=4, minute=0))
+  @tasks.loop(minutes=1)
   async def clearRaidBoards(self):
-    print("Clearing raid boards")
-    raidBoards = filter(
-        lambda ch: ch.name.startswith("\U0001f5bc"), self.bot.get_all_channels()
-    )
+    # get the current hh:mm, stripping seconds & ms
+    # since it's not guaranteed to run exactly on time
+    now = datetime.datetime.now().replace(microsecond=0, second=0)
 
-    def deleteCheck(m):
-      if (m.author.display_name == "Professor Hemlock" and
-          m.embeds) and (m.embeds[0].author):
-        return not m.embeds[0].author.name.startswith("EX ")
-      elif m.author == self.bot.user:
-        return False
-      else:
-        return True
+    exec_time = now.replace(hour=20, minute=7, second=0)
+    if now == exec_time:
+      print("Clearing raid boards")
+      raidBoards = filter(
+          lambda ch: ch.name.startswith("\U0001f5bc"), self.bot.get_all_channels()
+      )
 
-    for raidBoard in raidBoards:
-      await raidBoard.purge(limit=100, check=deleteCheck)
+      def deleteCheck(m):
+        if (m.author.display_name == "Professor Hemlock" and
+            m.embeds) and (m.embeds[0].author):
+          return not m.embeds[0].author.name.startswith("EX ")
+        elif m.author == self.bot.user:
+          return False
+        else:
+          return True
+
+      for raidBoard in raidBoards:
+        await raidBoard.purge(limit=100, check=deleteCheck)
 
   @commands.Cog.listener()
   async def on_guild_channel_create(self, channel):
