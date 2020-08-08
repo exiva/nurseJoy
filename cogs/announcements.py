@@ -34,13 +34,13 @@ class announcements(commands.Cog):
     self.currentVersion = "0.0.0"
     self.checkTweets.start()
     self.checkVersionForce.start()
-    self.nestsRotated.start()
+    # self.nestsRotated.start()
 
   def cog_unload(self):
     print("Unloading announcements cog...")
     self.checkTweets.cancel()
     self.checkVersionForce.cancel()
-    self.nestsRotated.cancel()
+    # self.nestsRotated.cancel()
     pass
 
   @commands.Cog.listener()
