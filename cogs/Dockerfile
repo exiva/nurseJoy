@@ -7,4 +7,4 @@ RUN cd /tmp && pipenv lock --requirements > requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 COPY . /app
-CMD ["python", "bot.py"]
+CMD ["python", "-u", "bot.py"]
