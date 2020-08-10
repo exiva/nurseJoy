@@ -110,7 +110,7 @@ class Maintenance(commands.Cog):
     # since it's not guaranteed to run exactly on time
     now = datetime.datetime.now().replace(microsecond=0, second=0)
 
-    exec_time = now.replace(hour=24, minute=0, second=0)
+    exec_time = now.replace(hour=0, minute=0, second=0)
     if now == exec_time:
       print("Clearing raid boards")
       raidBoards = filter(
