@@ -1,0 +1,9 @@
+version: "3"
+
+services: 
+  nursejoy:
+    image: joy
+    hostname: joy.local
+    container_name: nursejoy
+    build: .
+    restart: unless-stopped

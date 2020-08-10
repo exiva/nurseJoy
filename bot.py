@@ -13,12 +13,13 @@ cogs = [
     'cogs.fuckinghemlock',
     'cogs.maintenance',
     'cogs.userCommands',
+    'cogs.inviteclean',
 ]
 
 
 class Bot(commands.Bot):
   def __init__(self, **kwargs):
-    super().__init__(command_prefix=config.prefix, **kwargs)
+    super().__init__(command_prefix=config.prefix, case_insensitive=True, **kwargs)
     self.twitterTokens = config.twitter_tokens
 
     for cog in cogs:

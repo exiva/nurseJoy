@@ -5,7 +5,10 @@ import discord
 from discord.ext import tasks, commands
 from distutils.version import StrictVersion
 from peony import PeonyClient
-
+from peony.exceptions import PeonyException
+import math
+import time
+import datetime
 
 class announcements(commands.Cog):
   """Announcements cog
@@ -23,18 +26,21 @@ class announcements(commands.Cog):
         access_token=self.tokens['access_token'],
         access_token_secret=self.tokens['access_secret'],
     )
+    self.tweets = []
     self.twitters = [
-        ['PokemonGoApp', False, None],
-        ['chrales', True, None],
+        {'username': 'PokemonGoApp', 'spoiler': False, 'lastid': None},
+        {'username': 'chrales', 'spoiler': True, 'lastid': None},
     ]
     self.currentVersion = "0.0.0"
     self.checkTweets.start()
     self.checkVersionForce.start()
+    # self.nestsRotated.start()
 
   def cog_unload(self):
     print("Unloading announcements cog...")
     self.checkTweets.cancel()
     self.checkVersionForce.cancel()
+    # self.nestsRotated.cancel()
     pass
 
   @commands.Cog.listener()
@@ -45,19 +51,35 @@ class announcements(commands.Cog):
         name="announcements",
     )
 
+  #todo: fix this. posts multiple times, and on the wrong week.
+  
+  # @tasks.loop(time=datetime.time(hour=23, minute=0))
+  # async def nestsRotated(self):
+  #   if math.floor((time.time() - 1582693200) / 86400) % 14 == 0:
+  #     await self.ann_chan.send("Nests have migrated! Report new sightings on <http://thesilphroad.com/atlas>")
+
   @tasks.loop(seconds=30)
   async def checkTweets(self):
     for user in self.twitters:
-      tweets = await self.t.api.statuses.user_timeline.get(screen_name=user[0], count=1)
-      tweet = tweets[0]
-      if not user[2]:
-        user[2] = tweet.id_str
-      elif user[2] != tweet.id_str and tweet.in_reply_to_screen_name in (None, user[0]):
-        msg = f"https://twitter.com/{user[0]}/status/{tweet.id_str}"
-        if user[1]:  # Spoiler tweet
-          msg = f"|| {msg} ||"
-        await self.ann_chan.send(msg)
-      user[2] = tweet.id_str
+      try:
+        tweets = await self.t.api.statuses.user_timeline.get(screen_name=user['username'], count=1)
+        tweet = tweets[0]
+        if not user['lastid']:
+          tweets = await self.t.api.statuses.user_timeline.get(screen_name=user['username'], count=100)
+          for tweet in tweets:
+            self.tweets.append(tweet.id_str)
+          user['lastid'] = tweet.id_str
+        elif user['lastid'] != tweet.id_str and tweet.id_str not in self.tweets and tweet.in_reply_to_screen_name in (None, user['username']):
+          msg = f"https://twitter.com/{user['username']}/status/{tweet.id_str}"
+          if user['spoiler']:  # Spoiler tweet
+            msg = f"|| {msg} ||"
+          await self.ann_chan.send(msg)
+        user['lastid'] = tweet.id_str
+        self.tweets.append(tweet.id_str)
+      except PeonyException:
+        print("twitter exception")
+      except Exception as e:
+        print(f"Something else happened: {e}")
 
   @checkTweets.after_loop
   async def on_checkTweets_cancel(self):

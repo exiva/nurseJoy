@@ -4,15 +4,17 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pylint = "*"
+yapf = "*"
 
 [packages]
-discord = {git = "https://github.com/Rapptz/discord.py"}
+discord.py = "~1.3.4"
 pytz = "*"
 peony-twitter = "*"
 polyline = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8.5"
 
 [scripts]
 app = "python bot.py"

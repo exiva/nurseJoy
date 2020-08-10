@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import aiohttp
 import pytz
 from discord.ext import commands
 from datetime import datetime
 import discord
 import re
+import io
 
 
 class Mod(commands.Cog):
@@ -15,7 +17,7 @@ class Mod(commands.Cog):
   def __init__(self, bot):
     print(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
-    self.everyonetag = re.compile(r"@here|@everyone")
+    self.everyonetag = re.compile(r"@here|@everyone", re.IGNORECASE)
 
   def cog_unload(self):
     # clean up logic goes here
@@ -26,9 +28,9 @@ class Mod(commands.Cog):
     if 'Admins' in roles or 'Mods' in roles:
       return True
     # else:
-      # await ctx.send(
-          # f"access: PERMISSION DENIED....and...\n {ctx.author.mention} you didn't say the magic word!"
-      # )
+    # await ctx.send(
+    # f"access: PERMISSION DENIED....and...\n {ctx.author.mention} you didn't say the magic word!"
+    # )
 
   async def cog_after_invoke(self, ctx):
     # called after a command is called here
@@ -42,7 +44,7 @@ class Mod(commands.Cog):
 
   @commands.Cog.listener()
   async def on_message(self, message):
-    if bool(self.everyonetag.match(message.content)
+    if bool(re.search(self.everyonetag, message.content)
            ) and not message.channel.permissions_for(message.author).mention_everyone:
       type = re.search(self.everyonetag, message.content)
       count = len(message.guild.members
@@ -50,6 +52,20 @@ class Mod(commands.Cog):
       await message.channel.send(
           f"I'm sorry, {message.author.mention} I can only heal 6 Pok\U000000e9mon at a time. {count} is too many."
       )
+
+  @commands.Cog.listener()
+  async def on_message_delete(self, message):
+    embed = discord.Embed(title='Message Deleted', color=discord.Colour.red())
+    embed.add_field(name='Deleted By', value=message.author)
+    embed.add_field(name='Deleted From', value=message.channel.name, inline=True)
+    embed.add_field(name='Message Content', value=message.content, inline=False)
+    embed.set_thumbnail(url='https://i.imgur.com/bKeMCyG.png')
+    delete_log = discord.utils.get(
+        self.bot.get_all_channels(),
+        guild__id=339074243838869504,
+        name="delete-log",
+    )
+    await delete_log.send(embed=embed)
 
   @commands.Cog.listener()
   async def on_member_join(self, member):
@@ -182,6 +198,23 @@ class Mod(commands.Cog):
     )
 
     await ctx.send(embed=embed)
+
+  @commands.command()
+  async def say(self, ctx, channel: commands.Greedy[discord.TextChannel], *, message: str):
+    for c in channel:
+      if ctx.message.attachments:
+        files = []
+        async with aiohttp.ClientSession() as session:
+          for attachment in ctx.message.attachments:
+            async with session.get(attachment.proxy_url) as resp:
+              if resp.status != 200:
+                return print("Couldn't download image.")
+              img = io.BytesIO(await resp.read())
+              filename = attachment.filename
+              files.append(discord.File(img, filename))
+        await c.send(content=message, files=files)
+      else:
+        await c.send(content=message)
 
 
 def setup(bot):

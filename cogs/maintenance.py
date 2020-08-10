@@ -104,24 +104,30 @@ class Maintenance(commands.Cog):
               f"Please **only** use this channel for posting in-game screenshots of gyms with raid eggs/bosses or commands for raids, and keep chat in the appropriate raid channel or <#{chatChannel.id}>.\n\nMap screenshots do not work with the Raid bot. To start a raid manually type `!raid Tier Number or Boss Gym Name`"
           )
 
-  @tasks.loop(time=datetime.time(hour=4, minute=0))
+  @tasks.loop(minutes=1)
   async def clearRaidBoards(self):
-    print("Clearing raid boards")
-    raidBoards = filter(
-        lambda ch: ch.name.startswith("\U0001f5bc"), self.bot.get_all_channels()
-    )
+    # get the current hh:mm, stripping seconds & ms
+    # since it's not guaranteed to run exactly on time
+    now = datetime.datetime.now().replace(microsecond=0, second=0)
 
-    def deleteCheck(m):
-      if (m.author.display_name == "Professor Hemlock" and
-          m.embeds) and (m.embeds[0].author):
-        return not m.embeds[0].author.name.startswith("EX ")
-      elif m.author == self.bot.user:
-        return False
-      else:
-        return True
+    exec_time = now.replace(hour=0, minute=0, second=0)
+    if now == exec_time:
+      print("Clearing raid boards")
+      raidBoards = filter(
+          lambda ch: ch.name.startswith("\U0001f5bc"), self.bot.get_all_channels()
+      )
 
-    for raidBoard in raidBoards:
-      await raidBoard.purge(limit=100, check=deleteCheck)
+      def deleteCheck(m):
+        if (m.author.display_name == "Professor Hemlock" and
+            m.embeds) and (m.embeds[0].author):
+          return not m.embeds[0].author.name.startswith("EX ")
+        elif m.author == self.bot.user:
+          return False
+        else:
+          return True
+
+      for raidBoard in raidBoards:
+        await raidBoard.purge(limit=100, check=deleteCheck)
 
   @commands.Cog.listener()
   async def on_guild_channel_create(self, channel):
@@ -142,10 +148,12 @@ class Maintenance(commands.Cog):
         await channel.send(
             "**Note**: This channel will self destruct after the raid has completed. Only use this channel for raid coordination."
         )
-        await channel.send(
-            f"To get automatically alerted of raids at {message.embeds[0].title} in the future, send `!notify gym {message.embeds[0].title}` in <#{isRaidCat.id}>"
-        )
-
+        if message.embeds[0].title is not discord.Embed.Empty:
+          await channel.send(
+              f"To get automatically alerted of raids at {message.embeds[0].title} in the future, send `!notify gym {message.embeds[0].title}` in <#{isRaidCat.id}>"
+          )
+        await channel.send("__**COVID-19 Warning**__\nDuring the COVID-19 pandemic, please keep raid groups as small as possible. Practice social distancing staying 4 to 6 feet apart from each other if you cannot stay in vehicles during raids. Make use of the voice chat channels to keep distance from others. If you have any symptoms, stay home, Pokémon isn't worth spreading the virus.\n\nUpdates on the New York state of health can be found here https://www.health.ny.gov/diseases/communicable/coronavirus/")
+  
   @commands.command()
   async def initchannels(self, ctx):
     raidBoards = filter(
