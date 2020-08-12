@@ -179,17 +179,26 @@ class Mod(commands.Cog):
         name='Server Created', value=self.convert_time(server.created_at), inline=True
     )
 
+    embed.add_field(name='Server Features', value=', '.join(server.features).lower(), inline=True)
+  
+    embed.add_field(name='Server Boosts', value=server.premium_subscription_count)
+    embed.add_field(name='Server Boost Level', value=server.premium_tier)
+
     embed.add_field(name='Total Users', value=len(server.members), inline=True)
     embed.add_field(name='Users Online', value=online, inline=True)
 
-    embed.add_field(name='Roles', value=len(server.roles), inline=True)
+    embed.add_field(name='Total Roles', value=len(server.roles), inline=True)
     embed.add_field(name='Roles', value=', '.join(roles), inline=True)
 
     embed.add_field(name='Text Channels', value=txtchannel_count, inline=True)
     embed.add_field(name='Voice Channels', value=voicechannel_count, inline=True)
 
-    embed.add_field(name='Emoticons', value=len(server.emojis))
-    embed.add_field(name='Emoticons', value=', '.join(emoji), inline=True)
+    embed.add_field(name='Total Categories', value=len(server.categories))
+    
+    embed.add_field(name='Total Emoticons', value=f"{len(server.emojis)}/{server.emoji_limit}")
+
+    for i in range(0, len(emoji), 10):
+      embed.add_field(name=f'Emoticons', value=' '.join(emoji[i:i+10]), inline=True)
 
     embed.set_footer(
         icon_url=ctx.author.avatar_url,
