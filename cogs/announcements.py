@@ -30,6 +30,7 @@ class announcements(commands.Cog):
     self.twitters = [
         {'username': 'PokemonGoApp', 'spoiler': False, 'lastid': None},
         {'username': 'chrales', 'spoiler': True, 'lastid': None},
+        {'username': 'poke_miners', 'spoiler': True, 'lastid': None},
     ]
     self.currentVersion = "0.0.0"
     self.checkTweets.start()
