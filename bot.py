@@ -19,7 +19,12 @@ cogs = [
 
 class Bot(commands.Bot):
   def __init__(self, **kwargs):
-    super().__init__(command_prefix=config.prefix, case_insensitive=True, **kwargs)
+    super().__init__(
+      command_prefix=config.prefix,
+      case_insensitive=True,
+      activity=discord.Game(name="at the Pokémon Center"),
+      **kwargs)
+
     self.twitterTokens = config.twitter_tokens
 
     for cog in cogs:
@@ -34,7 +39,6 @@ class Bot(commands.Bot):
 
   async def on_ready(self):
     print('Logged on as {0} (ID: {0.id})'.format(self.user))
-    await bot.change_presence(activity=discord.Game(name='at the Pokémon Center!'))
 
   async def on_command_error(self, ctx, error):
     if isinstance(error, CommandNotFound):
