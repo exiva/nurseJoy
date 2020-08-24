@@ -237,9 +237,12 @@ class Mod(commands.Cog):
               img = io.BytesIO(await resp.read())
               filename = attachment.filename
               files.append(discord.File(img, filename))
-        await c.send(content=message, files=files)
+        msg = await c.send(content=message, files=files)
       else:
-        await c.send(content=message)
+        msg = await c.send(content=message)
+      
+      if c.is_news():
+        await msg.publish()
 
 
 def setup(bot):
