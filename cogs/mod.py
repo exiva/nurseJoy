@@ -124,6 +124,22 @@ class Mod(commands.Cog):
     )
     await member_log.send(embed=embed)
 
+  @commands.Cog.listener()
+  async def on_member_update(self, before, after):
+    if before.nick == after.nick:
+      return
+    embed = discord.Embed(title="Member Changed Nickname", color=int("86eef0", 16))
+    embed.set_thumbnail(url=before.avatar_url)
+    embed.add_field(
+        name='Username', value=f"{before.name}#{before.discriminator}", inline=True
+    )
+    embed.add_field(name='Nickname Change', value=f"`{before.nick}` to `{after.nick}`")
+    member_log = discord.utils.get(
+      self.bot.get_all_channels(),
+      guild__id=339074243838869504,
+      name="member-log",
+    )
+    await member_log.send(embed=embed)
   @commands.command(aliases=['uinfo'])
   async def userinfo(self, ctx, member: discord.Member):
     roles = [str(role) for role in member.roles[1:]]
