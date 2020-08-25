@@ -80,7 +80,7 @@ class userCommands(commands.Cog):
     invite = await first_chan.create_invite(
         max_age=24 * 3600, reason=f"Requested by {ctx.message.author}"
     )
-    qr = segno.make_qr(invite)
+    qr = segno.make_qr(invite.url)
     out = BytesIO()
     qr.save(out, scale=6, kind='png')
     out.seek(0)
