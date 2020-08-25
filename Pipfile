@@ -10,7 +10,7 @@ autopep8 = "*"
 rope = "*"
 
 [packages]
-discord.py = "~1.4.1"
+"discord.py" = "~=1.4.1"
 pytz = "*"
 peony-twitter = "*"
 polyline = "*"
