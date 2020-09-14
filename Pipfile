@@ -15,6 +15,7 @@ pytz = "*"
 peony-twitter = "*"
 polyline = "*"
 segno = "~=1.2.0"
+aiofile = "~=3.1.0"
 
 [requires]
 python_version = "3.8.5"
