@@ -54,40 +54,6 @@ class Mod(commands.Cog):
       )
 
   @commands.Cog.listener()
-  async def on_message_delete(self, message):
-    ignoreUsers = [self.bot.user, self.bot.get_user(448855673623805966)]
-    if not message.author in ignoreUsers:
-      embed = discord.Embed(title='Message Deleted', color=discord.Colour.red())
-      embed.add_field(name='Posted By', value=message.author)
-      embed.add_field(name='User ID', value=message.author.id)
-      embed.add_field(name='Deleted From', value=message.channel.name, inline=True)
-      if message.content:
-        embed.add_field(name='Message Content', value=message.content, inline=False)
-      embed.set_thumbnail(url='https://i.imgur.com/bKeMCyG.png')
-      delete_log = discord.utils.get(
-        self.bot.get_all_channels(),
-        guild__id=339074243838869504,
-        name="delete-log",
-      )
-      if message.attachments:
-        file = None
-        async with aiohttp.ClientSession() as session:
-          for attachment in message.attachments:
-            print(attachment.proxy_url)
-            async with session.get(attachment.proxy_url) as resp:
-              if resp.status != 200:
-                await delete_log.send("There was an image, but couldn't download it.")
-                await delete_log.send(embed=embed)
-                return
-              img = io.BytesIO(await resp.read())
-              filename = attachment.filename
-              print(filename)
-              file = discord.File(img, filename)
-          await delete_log.send(embed=embed, file=file)
-      else:
-        await delete_log.send(embed=embed)
-
-  @commands.Cog.listener()
   async def on_member_join(self, member):
     embed = discord.Embed(title="New Member", color=int("86eef0", 16))
     embed.set_thumbnail(url=member.avatar_url)
