@@ -8,14 +8,14 @@ import config
 import logging
 
 cogs = [
-  'cogs.dev',
-    # 'cogs.system',
-    # 'cogs.announcements',
-    # 'cogs.mod',
-    # 'cogs.fuckinghemlock',
-    # 'cogs.maintenance',
-    # 'cogs.userCommands',
-    # 'cogs.inviteclean',
+    'cogs.system',
+    'cogs.announcements',
+    'cogs.mod',
+    'cogs.fuckinghemlock',
+    'cogs.maintenance',
+    'cogs.userCommands',
+    'cogs.inviteclean',
+    'cogs.deletelog',
 ]
 
 
