@@ -12,7 +12,8 @@ class userCommands(commands.Cog):
         Commands users can run
     """
   def __init__(self, bot):
-    print(f"Loaded {self.__class__.__name__} cog")
+    self.logger = bot.logger
+    self.logger.info(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
 
   def cog_unload(self):

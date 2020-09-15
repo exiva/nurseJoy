@@ -8,6 +8,8 @@ class Inviteclean(commands.Cog):
     """The description for Inviteclean goes here."""
 
     def __init__(self, bot):
+        self.logger = bot.logger
+        self.logger.info(f"Loaded {self.__class__.__name__} cog")
         self.bot = bot
         self.inviteurl = re.compile(r"(?:https?://)?(?:www\.)?(?:discord(?:\.| |\[?\(?\"?'?dot'?\"?\)?\]?)?(?:gg|io|me|li)|discordapp\.com/invite|silph.gg/t)/+((?:(?!https?)[\w\d-])+)", flags=re.IGNORECASE)
         self.allowedDiscords = [339074243838869504, 261360369681956864, 237964415822069760, 201304964495048704]

@@ -22,7 +22,8 @@ class Maintenance(commands.Cog):
         clearRaidBoards - Cleans raid board channels at midnight.
     """
   def __init__(self, bot):
-    print(f"Loaded {self.__class__.__name__} cog")
+    self.logger = bot.logger
+    self.logger.info(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
     self.cleantrades.start()
     self.bottomPinned.start()
@@ -112,7 +113,7 @@ class Maintenance(commands.Cog):
 
     exec_time = now.replace(hour=4, minute=0, second=0)
     if now == exec_time:
-      print("Clearing raid boards")
+      self.logger.info("Clearing raid boards")
       raidBoards = filter(
           lambda ch: ch.name.startswith("\U0001f5bc"), self.bot.get_all_channels()
       )
@@ -171,7 +172,7 @@ class Maintenance(commands.Cog):
           async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
               if resp.status != 200:
-                return print("Couldn't download image.")
+                return self.logger.error("Couldn't download image.")
               img = io.BytesIO(await resp.read())
 
               embed = discord.Embed(
@@ -186,7 +187,7 @@ class Maintenance(commands.Cog):
 
               await sendembed.pin()
     except Exception as e:
-      print(f"{e.__class__.__name__} {e}")
+      self.logger.error(f"{e.__class__.__name__} {e}")
 
 
 def setup(bot):

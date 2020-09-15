@@ -15,7 +15,8 @@ class Mod(commands.Cog):
 
     """
   def __init__(self, bot):
-    print(f"Loaded {self.__class__.__name__} cog")
+    self.logger = bot.logger
+    self.logger.info(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
     self.everyonetag = re.compile(r"@here|@everyone", re.IGNORECASE)
 
@@ -126,6 +127,7 @@ class Mod(commands.Cog):
       name="member-log",
     )
     await member_log.send(embed=embed)
+
   @commands.command(aliases=['uinfo'])
   async def userinfo(self, ctx, member: discord.Member):
     roles = [str(role) for role in member.roles[1:]]
@@ -154,7 +156,6 @@ class Mod(commands.Cog):
   @userinfo.error
   async def uinfo_error(self, ctx, error):
     if isinstance(error, commands.BadArgument):
-      print(error)
       await ctx.send('I could not find that member.')
 
   @commands.command(aliases=['sinfo'])
@@ -219,7 +220,7 @@ class Mod(commands.Cog):
           for attachment in ctx.message.attachments:
             async with session.get(attachment.proxy_url) as resp:
               if resp.status != 200:
-                return print("Couldn't download image.")
+                return self.logger.warn("Couldn't download image.")
               img = io.BytesIO(await resp.read())
               filename = attachment.filename
               files.append(discord.File(img, filename))
