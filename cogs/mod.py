@@ -15,7 +15,8 @@ class Mod(commands.Cog):
 
     """
   def __init__(self, bot):
-    print(f"Loaded {self.__class__.__name__} cog")
+    self.logger = bot.logger
+    self.logger.info(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
     self.everyonetag = re.compile(r"@here|@everyone", re.IGNORECASE)
 
@@ -124,6 +125,23 @@ class Mod(commands.Cog):
     )
     await member_log.send(embed=embed)
 
+  @commands.Cog.listener()
+  async def on_member_update(self, before, after):
+    if before.nick == after.nick:
+      return
+    embed = discord.Embed(title="Member Changed Nickname", color=int("86eef0", 16))
+    embed.set_thumbnail(url=before.avatar_url)
+    embed.add_field(
+        name='Username', value=f"{before.name}#{before.discriminator}", inline=True
+    )
+    embed.add_field(name='Nickname Change', value=f"`{before.nick}` to `{after.nick}`")
+    member_log = discord.utils.get(
+      self.bot.get_all_channels(),
+      guild__id=339074243838869504,
+      name="member-log",
+    )
+    await member_log.send(embed=embed)
+
   @commands.command(aliases=['uinfo'])
   async def userinfo(self, ctx, member: discord.Member):
     roles = [str(role) for role in member.roles[1:]]
@@ -152,7 +170,6 @@ class Mod(commands.Cog):
   @userinfo.error
   async def uinfo_error(self, ctx, error):
     if isinstance(error, commands.BadArgument):
-      print(error)
       await ctx.send('I could not find that member.')
 
   @commands.command(aliases=['sinfo'])
@@ -179,17 +196,26 @@ class Mod(commands.Cog):
         name='Server Created', value=self.convert_time(server.created_at), inline=True
     )
 
+    embed.add_field(name='Server Features', value=', '.join(server.features).lower(), inline=True)
+  
+    embed.add_field(name='Server Boosts', value=server.premium_subscription_count)
+    embed.add_field(name='Server Boost Level', value=server.premium_tier)
+
     embed.add_field(name='Total Users', value=len(server.members), inline=True)
     embed.add_field(name='Users Online', value=online, inline=True)
 
-    embed.add_field(name='Roles', value=len(server.roles), inline=True)
+    embed.add_field(name='Total Roles', value=len(server.roles), inline=True)
     embed.add_field(name='Roles', value=', '.join(roles), inline=True)
 
     embed.add_field(name='Text Channels', value=txtchannel_count, inline=True)
     embed.add_field(name='Voice Channels', value=voicechannel_count, inline=True)
 
-    embed.add_field(name='Emoticons', value=len(server.emojis))
-    embed.add_field(name='Emoticons', value=', '.join(emoji), inline=True)
+    embed.add_field(name='Total Categories', value=len(server.categories))
+    
+    embed.add_field(name='Total Emoticons', value=f"{len(server.emojis)}/{server.emoji_limit}")
+
+    for i in range(0, len(emoji), 10):
+      embed.add_field(name=f'Emoticons', value=' '.join(emoji[i:i+10]), inline=True)
 
     embed.set_footer(
         icon_url=ctx.author.avatar_url,
@@ -208,13 +234,16 @@ class Mod(commands.Cog):
           for attachment in ctx.message.attachments:
             async with session.get(attachment.proxy_url) as resp:
               if resp.status != 200:
-                return print("Couldn't download image.")
+                return self.logger.warn("Couldn't download image.")
               img = io.BytesIO(await resp.read())
               filename = attachment.filename
               files.append(discord.File(img, filename))
-        await c.send(content=message, files=files)
+        msg = await c.send(content=message, files=files)
       else:
-        await c.send(content=message)
+        msg = await c.send(content=message)
+      
+      if c.is_news():
+        await msg.publish()
 
 
 def setup(bot):

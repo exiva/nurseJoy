@@ -6,12 +6,16 @@ verify_ssl = true
 [dev-packages]
 pylint = "*"
 yapf = "*"
+autopep8 = "*"
+rope = "*"
 
 [packages]
-discord.py = "~1.3.4"
+"discord.py" = "~=1.4.1"
 pytz = "*"
 peony-twitter = "*"
 polyline = "*"
+segno = "~=1.2.0"
+aiofile = "~=3.1.0"
 
 [requires]
 python_version = "3.8.5"

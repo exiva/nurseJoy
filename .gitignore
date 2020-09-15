@@ -29,3 +29,4 @@ var/
 
 # Our configuration files
 config.py
+.vscode/settings.json

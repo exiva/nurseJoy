@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import segno
 import asyncio
 from discord.ext import commands
 import discord
+from io import BytesIO
 
 
 class userCommands(commands.Cog):
@@ -10,7 +12,8 @@ class userCommands(commands.Cog):
         Commands users can run
     """
   def __init__(self, bot):
-    print(f"Loaded {self.__class__.__name__} cog")
+    self.logger = bot.logger
+    self.logger.info(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
 
   def cog_unload(self):
@@ -78,8 +81,13 @@ class userCommands(commands.Cog):
     invite = await first_chan.create_invite(
         max_age=24 * 3600, reason=f"Requested by {ctx.message.author}"
     )
+    qr = segno.make_qr(invite.url)
+    out = BytesIO()
+    qr.save(out, scale=6, kind='png')
+    out.seek(0)
     await ctx.send(
-        content=f"Here's your invite, {ctx.message.author.mention}. {invite}",
+        content=f"Here's your invite and a QR code, {ctx.message.author.mention}. {invite}",
+        file=discord.File(out, f'qrCode{invite.code}.png'),
         delete_after=5 * 60
     )
 

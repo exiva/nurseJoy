@@ -16,7 +16,8 @@ class System(commands.Cog):
 
     """
   def __init__(self, bot):
-    print(f"Loaded {self.__class__.__name__} cog")
+    self.logger = bot.logger
+    self.logger.info(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
 
   def cog_unload(self):
@@ -145,7 +146,7 @@ class System(commands.Cog):
       )
 
     except Exception as e:
-      print(e)
+      self.logger.error(e)
 
   @commands.command()
   async def ban(
@@ -186,7 +187,7 @@ class System(commands.Cog):
             )
         )
     except Exception as e:
-      print(e)
+      self.logger.error(e)
 
 
 def setup(bot):

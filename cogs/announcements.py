@@ -17,7 +17,8 @@ class announcements(commands.Cog):
 
     """
   def __init__(self, bot):
-    print(f"Loaded {self.__class__.__name__} cog")
+    self.logger = bot.logger
+    self.logger.info(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
     self.tokens = bot.twitterTokens
     self.t = PeonyClient(
@@ -30,6 +31,7 @@ class announcements(commands.Cog):
     self.twitters = [
         {'username': 'PokemonGoApp', 'spoiler': False, 'lastid': None},
         {'username': 'chrales', 'spoiler': True, 'lastid': None},
+        {'username': 'poke_miners', 'spoiler': True, 'lastid': None},
     ]
     self.currentVersion = "0.0.0"
     self.checkTweets.start()
@@ -37,7 +39,7 @@ class announcements(commands.Cog):
     # self.nestsRotated.start()
 
   def cog_unload(self):
-    print("Unloading announcements cog...")
+    self.logger.info("Unloading announcements cog...")
     self.checkTweets.cancel()
     self.checkVersionForce.cancel()
     # self.nestsRotated.cancel()
@@ -77,9 +79,10 @@ class announcements(commands.Cog):
         user['lastid'] = tweet.id_str
         self.tweets.append(tweet.id_str)
       except PeonyException:
-        print("twitter exception")
+        self.logger.error("twitter exception")
       except Exception as e:
-        print(f"Something else happened: {e}")
+        self.logger.error(f"Something else happened: {e}")
+
 
   @checkTweets.after_loop
   async def on_checkTweets_cancel(self):
