@@ -83,6 +83,7 @@ class announcements(commands.Cog):
       except Exception as e:
         self.logger.error(f"Something else happened: {e}")
 
+
   @checkTweets.after_loop
   async def on_checkTweets_cancel(self):
     await self.t.close()
