@@ -49,6 +49,7 @@ class Deletelog(commands.Cog):
       if files:
         attachments = []
         for file in files:
+          embed.set_image(url=f"attachment://{path.basename(file)}")
           attachments.append(discord.File(file))
         await delete_log.send(embed=embed, files=attachments)
       else:
