@@ -31,6 +31,8 @@ class Bot(commands.Bot):
     logging.basicConfig(level=logging.INFO)
     self.disc_logger = logging.getLogger('discord')
     self.disc_logger.setLevel(logging.ERROR)
+    self.peony_logger = logging.getLogger('peony')
+    self.peony_logger.setLevel(logging.ERROR)
 
     self.twitterTokens = config.twitter_tokens
 
