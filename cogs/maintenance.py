@@ -153,7 +153,13 @@ class Maintenance(commands.Cog):
           await channel.send(
               f"To get automatically alerted of raids at {message.embeds[0].title} in the future, send `!notify gym {message.embeds[0].title}` in <#{isRaidCat.id}>"
           )
-        await channel.send("__**COVID-19 Warning**__\nDuring the COVID-19 pandemic, please keep raid groups as small as possible. Practice social distancing staying 4 to 6 feet apart from each other if you cannot stay in vehicles during raids. Make use of the voice chat channels to keep distance from others. If you have any symptoms, stay home, Pokémon isn't worth spreading the virus.\n\nUpdates on the New York state of health can be found here https://www.health.ny.gov/diseases/communicable/coronavirus/")
+        co19_message = discord.Embed(
+          title="COVID-19 Warning",
+          description="During this COVID-19 pandemic, please keep raid groups as small as possible, or join from the comfort and safety of your home using Remote Raid passes. If you do raid in person, stay in your vehicle if possible. If you must get out to raid at a gym, please remain 6 or more feet apart from each other, and **always** wear your mask. Members reported to be not adhering to this will be asked to leave. Make use of our voice chat channels in order to maintain contact while staying isolated. If you have any symptoms, stay home, Pokémon isn't worth spreading the virus. If you've traveled out of the state in the last 14 days, stay home, quarantine, and raid remotely following the [Travel Advisory guidance from NYS.](https://coronavirus.health.ny.gov/covid-19-travel-advisory)\n\nStay safe and healthy.\n-Nurse Joy\n\nUpdates from the New York state of health can be found here https://coronavirus.health.ny.gov/home",
+          color=int("ffff00", 16)
+        )
+        co19_message.set_thumbnail(url="https://i.imgur.com/8GAzG3b.png")
+        await channel.send(embed=co19_message)
   
   @commands.command()
   async def initchannels(self, ctx):
