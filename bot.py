@@ -16,6 +16,7 @@ cogs = [
     'cogs.userCommands',
     'cogs.inviteclean',
     'cogs.deletelog',
+    'cogs.messenger',
 ]
 
 
