@@ -306,5 +306,33 @@ class Mod(commands.Cog):
     except Exception as e:
       self.logger.error(e)
 
+  @commands.command()
+  async def mute(self, ctx, member: discord.Member, time: int = 10, *, reason=None):
+    log_chn = discord.utils.get(
+        self.bot.get_all_channels(),
+        guild__id=339074243838869504,
+        name="member-log",
+      )
+
+    embed = discord.Embed(title='Member Muted', color=discord.Colour.red())
+    embed.add_field(name='Muted Member', value=f"{member.name}#{member.discriminator}")
+    embed.add_field(name='Muted By', value=ctx.message.author)
+    embed.add_field(name='Length', value=time)
+    embed.add_field(name='Reason', value=f"{reason if reason else 'None Provided'}")
+
+    for c in ctx.guild.channels:
+      await c.set_permissions(member,
+            send_messages=False,
+            add_reactions=False
+            )
+    
+    await log_chn.send(embed=embed)
+    await ctx.send(f"{member.mention} you have been muted for {time} minutes.")
+
+    await asyncio.sleep(time * 60)
+    for c in ctx.guild.channels:
+      await c.set_permissions(member, overwrite=None)
+
+
 def setup(bot):
   bot.add_cog(Mod(bot))
