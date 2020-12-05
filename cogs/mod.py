@@ -130,6 +130,32 @@ class Mod(commands.Cog):
     )
     await member_log.send(embed=embed)
 
+  @commands.Cog.listener()
+  async def on_user_update(self, before, after):
+    member_log = discord.utils.get(
+      self.bot.get_all_channels(),
+      guild__id=339074243838869504,
+      name="member-log",
+    )
+
+    if before.name != after.name:
+      embed = discord.Embed(title="Member Changed Username", color=int("86eef0", 16))
+      embed.set_thumbnail(url=before.avatar_url)
+      embed.add_field(
+        name='Username', value=f"{before.name}#{before.discriminator}", inline=True
+        )
+      embed.add_field(name='Username Change', value=f"`{before.name}` to `{after.name}`")
+      await member_log.send(embed=embed)
+
+    if before.avatar != after.avatar:
+      embed = discord.Embed(title="Member Changed Avatar", color=int("86eef0", 16))
+      embed.set_thumbnail(url=before.avatar_url)
+      embed.add_field(
+        name='Username', value=f"{after.name}#{after.discriminator}", inline=True
+        )
+      embed.set_image(url=after.avatar_url)
+      await member_log.send(embed=embed)
+
   @commands.command(aliases=['uinfo'])
   async def userinfo(self, ctx, member: discord.Member):
     roles = [str(role) for role in member.roles[1:]]
