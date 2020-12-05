@@ -27,6 +27,7 @@ class Bot(commands.Bot):
       command_prefix=config.prefix,
       case_insensitive=True,
       activity=discord.Game(name="at the Pokémon Center"),
+      intents=discord.Intents.all(),
       **kwargs)
 
     self.logger = logging.getLogger(__name__)
