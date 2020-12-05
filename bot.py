@@ -17,6 +17,7 @@ cogs = [
     'cogs.inviteclean',
     'cogs.deletelog',
     'cogs.messenger',
+    'cogs.pganfeed',
 ]
 
 
