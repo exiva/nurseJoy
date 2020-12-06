@@ -59,11 +59,10 @@ class fuckingHemlock(commands.Cog):
       await ctx.send(f"{ctx.message.author.mention}, you don't have a team set. Please set your team by sending `!team instinct, mystic, or valor`.")
     
     if ctx.invoked_with in ["please","p","please-invite","invite-pls","invitepls","invite-plz","inviteplz","plz","pls","pleaseinvite","remote","r","home"]:
+
       rslt = await self.db_conn.execute_query(f"""SELECT `friend_code`, `in_game_name` FROM `User` WHERE `userSnowflake` = (%s)""", (ctx.message.author.id))
-      self.logger.info(rslt)
-      self.logger.info(bool(rslt[0][0]))
       if not rslt or (not rslt[0][0] or not rslt[0][1]):
-        await ctx.send(f"{ctx.message.author.mention}, you don't have your friend code or in gane name setup in Hemlock, set them by sending `!ign your trainername` and `!fc your code` so others can invite you.")
+        await ctx.send(f"{ctx.message.author.mention}, you don't have your friend code or in game name setup in Hemlock, set them by sending `!ign your trainername` and `!fc your code` so others can invite you.")
 
 
   @commands.Cog.listener()
@@ -83,7 +82,7 @@ class fuckingHemlock(commands.Cog):
     if payload.emoji.id in remote_emojis and payload.event_type == "REACTION_ADD":
       rslt = await self.db_conn.execute_query(f"""SELECT `friend_code`, `in_game_name` FROM `User` WHERE `userSnowflake` = (%s)""", (payload.user_id))
       if not rslt or (not rslt[0][0] or not rslt[0][1]):
-        await channel.send(f"{user.mention}, you don't have your friend code or in gane name setup in Hemlock, set them by sending `!ign your trainername` and `!fc your code` so others can invite you.")
+        await channel.send(f"{user.mention}, you don't have your friend code or in game name setup in Hemlock, set them by sending `!ign your trainername` and `!fc your code` so others can invite you.")
 
 def setup(bot):
   bot.add_cog(fuckingHemlock(bot))
