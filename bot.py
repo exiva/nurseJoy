@@ -9,6 +9,7 @@ import logging
 
 cogs = [
     'cogs.system',
+    'cogs.hemlockdb',
     'cogs.announcements',
     'cogs.mod',
     'cogs.fuckinghemlock',
@@ -36,7 +37,8 @@ class Bot(commands.Bot):
     self.disc_logger.setLevel(logging.ERROR)
     self.peony_logger = logging.getLogger('peony')
     self.peony_logger.setLevel(logging.ERROR)
-
+    
+    self.config = config
     self.twitterTokens = config.twitter_tokens
 
     for cog in cogs:
