@@ -31,7 +31,7 @@ class Deletelog(commands.Cog):
 
   @commands.Cog.listener()
   async def on_message_delete(self, message):
-    ignoreUsers = [self.bot.user, self.bot.get_user(448855673623805966)]
+    ignoreUsers = [self.bot.user, self.bot.get_user(448855673623805966), self.bot.get_user(343128185744916520), self.bot.get_user(343127550752587788), self.bot.get_user(290601744042295296), self.bot.get_user(343122881024229377), self.bot.get_user(343127029857648640)]
     if not message.author in ignoreUsers:
       embed = discord.Embed(title='Message Deleted', color=discord.Colour.red())
       embed.add_field(name='Posted By', value=message.author)
