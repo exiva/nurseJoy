@@ -1,9 +1,22 @@
 version: "3"
 
-services: 
+services:
   nursejoy:
     image: joy
     hostname: joy.local
     container_name: nursejoy
     build: .
     restart: unless-stopped
+  database:
+    image: "postgres"
+    ports:
+      - 5432:5432
+    env_file:
+      - database.env
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    restart:
+      unless-stopped
+
+volumes:
+  database-data:
