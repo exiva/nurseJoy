@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import asyncio
 import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 import config
 import logging
+import asyncpg
 
 cogs = [
     'cogs.system',
@@ -21,6 +23,15 @@ cogs = [
     'cogs.pganfeed',
 ]
 
+async def init():
+  db = await asyncpg.create_pool(**config.creds)
+
+  try:
+    bot = Bot(db=db)
+    await bot.start(config.token)
+  except KeyboardInterrupt:
+    await bot.logout()
+
 
 class Bot(commands.Bot):
   def __init__(self, **kwargs):
@@ -30,6 +41,7 @@ class Bot(commands.Bot):
       activity=discord.Game(name="at the Pokémon Center"),
       intents=discord.Intents.all(),
       **kwargs)
+    self.db = kwargs.pop("db")
 
     self.logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO)
@@ -56,5 +68,5 @@ class Bot(commands.Bot):
       pass
 
 
-bot = Bot()
-bot.run(config.token)
+loop = asyncio.get_event_loop()
+loop.run_until_complete(init())

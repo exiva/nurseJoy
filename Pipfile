@@ -18,6 +18,7 @@ segno = "~=1.2.0"
 aiofile = "~=3.1.0"
 
 aiomysql = "*"
+asyncpg = "~=0.21.0"
 
 [scripts]
 app = "python bot.py"
