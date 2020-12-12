@@ -21,6 +21,7 @@ cogs = [
     'cogs.deletelog',
     'cogs.messenger',
     'cogs.pganfeed',
+    'cogs.holidaycontest',
 ]
 
 async def init():

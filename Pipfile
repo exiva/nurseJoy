@@ -19,6 +19,7 @@ aiofile = "~=3.1.0"
 
 aiomysql = "*"
 asyncpg = "~=0.21.0"
+prettytable = "*"
 
 [scripts]
 app = "python bot.py"
