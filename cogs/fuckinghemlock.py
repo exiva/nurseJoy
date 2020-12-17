@@ -4,6 +4,7 @@ from discord.ext import commands
 import asyncio
 import discord
 import asyncpg
+import sys
 
 class fuckingHemlock(commands.Cog):
   """
@@ -54,26 +55,31 @@ class fuckingHemlock(commands.Cog):
     "please","p","please-invite","invite-pls","invitepls","invite-plz","inviteplz",
     "plz","pls","pleaseinvite","remote","r","home"])
   async def maybe(self, ctx):
-    #### Holiday Contest
-    qry = "SELECT attendees FROM raids WHERE channelid = $1"
-    rows = await self.db.fetch(qry, ctx.channel.id)
-    if ctx.author.id not in rows[0]['attendees']:
-      update_query = "UPDATE raids SET attendees = array_append(attendees, $1) WHERE channelid = $2"
-      await self.db.execute(update_query, ctx.author.id, ctx.channel.id)
-      if ctx.author.id == 222435142918995968:
-        return
-      # get participation in contest
-      usr_qry = "SELECT uid FROM holiday_contest WHERE uid = $1"
-      rows = await self.db.fetch(usr_qry, ctx.author.id)
-      # not in db yet. add to db
-      if not rows:
-        qry = "INSERT INTO holiday_contest(uid) VALUES($1)"
-        await self.db.execute(qry, ctx.author.id)
-      # award points
-      point_qry = "UPDATE holiday_contest SET score = score + 1 where uid = $1"
-      await self.db.execute(point_qry, ctx.author.id)
-      log = self.bot.get_channel(345910796016156676)
-      await log.send(f"{ctx.author.display_name}#{ctx.author.discriminator} earned 1 points for joining a raid")
+    try:
+      async with self.db.acquire() as conn:
+        #### Holiday Contest
+        qry = "SELECT attendees FROM raids WHERE channelid = $1"
+        rows = await conn.fetch(qry, ctx.channel.id)
+        if ctx.author.id not in rows[0]['attendees']:
+          update_query = "UPDATE raids SET attendees = array_append(attendees, $1) WHERE channelid = $2"
+          await conn.execute(update_query, ctx.author.id, ctx.channel.id)
+          if ctx.author.id == 222435142918995968:
+            return
+          # get participation in contest
+          usr_qry = "SELECT uid FROM holiday_contest WHERE uid = $1"
+          rows = await conn.fetch(usr_qry, ctx.author.id)
+          # not in db yet. add to db
+          if not rows:
+            qry = "INSERT INTO holiday_contest(uid) VALUES($1)"
+            await conn.execute(qry, ctx.author.id)
+          # award points
+          point_qry = "UPDATE holiday_contest SET score = score + 1 where uid = $1"
+          await conn.execute(point_qry, ctx.author.id)
+          log = self.bot.get_channel(607287123409633283)
+          await ctx.send(f"{ctx.author.display_name}#{ctx.author.discriminator} earned 1 points for joining a raid")
+          await log.send(f"{ctx.author.display_name}#{ctx.author.discriminator} earned 1 points for joining a raid")
+    except Exception as e:
+      self.logger.error(f"fuckinghemlock: Command Exception {e} Full stacktrace\n{sys.exc_info()}")
 
     teams = set(['instinct', 'mystic', 'valor'])
     roles = set([r.name.lower() for r in ctx.message.author.roles])
@@ -97,26 +103,31 @@ class fuckingHemlock(commands.Cog):
     message = await channel.fetch_message(payload.message_id)
     user = message.guild.get_member(payload.user_id)
     if payload.emoji.id in emojis and payload.event_type == "REACTION_ADD":
-      #### Holiday Contest
-      qry = "SELECT attendees FROM raids WHERE channelid = $1"
-      rows = await self.db.fetch(qry, payload.channel_id)
-      if user.id not in rows[0]['attendees']:
-        update_query = "UPDATE raids SET attendees = array_append(attendees, $1) WHERE channelid = $2"
-        await self.db.execute(update_query, user.id, payload.channel_id)
-        # get participation in contest
-        if user.id == 222435142918995968:
-          return
-        usr_qry = "SELECT uid FROM holiday_contest WHERE uid = $1"
-        rows = await self.db.fetch(usr_qry, user.id)
-        # not in db yet. add to db
-        if not rows:
-          qry = "INSERT INTO holiday_contest(uid) VALUES($1)"
-          await self.db.execute(qry, user.id)
-        # award points
-        point_qry = "UPDATE holiday_contest SET score = score + 1 where uid = $1"
-        await self.db.execute(point_qry, user.id)
-        log = self.bot.get_channel(345910796016156676)
-        await log.send(f"{user.display_name}#{user.discriminator} earned 1 points for posting a raid")
+      try:
+        async with self.db.acquire() as conn:
+          #### Holiday Contest
+          qry = "SELECT attendees FROM raids WHERE channelid = $1"
+          rows = await conn.fetch(qry, payload.channel_id)
+          if user.id not in rows[0]['attendees']:
+            update_query = "UPDATE raids SET attendees = array_append(attendees, $1) WHERE channelid = $2"
+            await conn.execute(update_query, user.id, payload.channel_id)
+            # get participation in contest
+            if user.id == 222435142918995968:
+              return
+            usr_qry = "SELECT uid FROM holiday_contest WHERE uid = $1"
+            rows = await conn.fetch(usr_qry, user.id)
+            # not in db yet. add to db
+            if not rows:
+              qry = "INSERT INTO holiday_contest(uid) VALUES($1)"
+              await conn.execute(qry, user.id)
+            # award points
+            point_qry = "UPDATE holiday_contest SET score = score + 1 where uid = $1"
+            await conn.execute(point_qry, user.id)
+            log = self.bot.get_channel(607287123409633283)
+            await channel.send(f"{user.display_name}#{user.discriminator} earned 1 points for joining a raid")
+            await log.send(f"{user.display_name}#{user.discriminator} earned 1 points for joining a raid")
+      except Exception as e:
+        self.logger.error(f"fuckinghemlock: Reaction Exception {e} Full stacktrace\n{sys.exc_info()}")
 
       teams = set(['instinct', 'mystic', 'valor'])
       roles = set([r.name.lower() for r in user.roles])
