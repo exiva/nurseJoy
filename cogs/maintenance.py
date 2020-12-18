@@ -26,12 +26,10 @@ class Maintenance(commands.Cog):
     self.logger.info(f"Loaded {self.__class__.__name__} cog")
     self.bot = bot
     self.cleantrades.start()
-    self.bottomPinned.start()
     self.clearRaidBoards.start()
 
   def cog_unload(self):
     self.cleantrades.cancel()()
-    self.bottomPinned.cancel()
     self.clearRaidBoards.cancel()
     # clean up logic goes here
     pass
@@ -83,27 +81,24 @@ class Maintenance(commands.Cog):
   async def before_cleantrades(self):
     await self.bot.wait_until_ready()
 
-  @tasks.loop(seconds=10)
-  async def bottomPinned(self):
-    raidBoards = filter(
-        lambda ch: ch.name.startswith("\U0001f5bc"), self.bot.get_all_channels()
-    )
+  @commands.Cog.listener()
+  async def on_message(self, message):
+    if not message.channel.name.startswith("\U0001f5bc"):
+      return
 
     def deleteCheck(m):
       if m.author == self.bot.user and not m.pinned:
         return True
 
-    for raidBoard in raidBoards:
-      messages = await raidBoard.history(limit=1).flatten()
-      for m in messages:
-        if m.author != self.bot.user:
-          chatChannel = discord.utils.find(
-              lambda c: c.name.endswith("-chat"), raidBoard.category.channels
+    messages = await message.channel.history(limit=1).flatten()
+    if messages[0].author != self.bot.user:
+      chatChannel = discord.utils.find(
+              lambda c: c.name.endswith("-chat"), message.channel.category.channels
           )
-          await raidBoard.purge(limit=100, check=deleteCheck)
-          await raidBoard.send(
-              f"Please **only** use this channel for posting in-game screenshots of gyms with raid eggs/bosses or commands for raids, and keep chat in the appropriate raid channel or <#{chatChannel.id}>.\n\nMap screenshots do not work with the Raid bot. To start a raid manually type `!raid Tier Number or Boss Gym Name`"
-          )
+      await message.channel.purge(limit=100, check=deleteCheck)
+      await message.channel.send(
+        f"Please **only** use this channel for posting in-game screenshots of gyms with raid eggs/bosses or commands for raids, and keep chat in the appropriate raid channel or <#{chatChannel.id}>.\n\nMap screenshots do not work with the Raid bot. To start a raid manually type `!raid Tier Number or Boss Gym Name`"
+      )
 
   @tasks.loop(minutes=1)
   async def clearRaidBoards(self):
