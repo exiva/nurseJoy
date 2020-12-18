@@ -7,7 +7,6 @@ import asyncpg
 from prettytable import PrettyTable
 from prettytable import MARKDOWN
 from datetime import datetime
-import pytz
 import sys
 
 class Contest(commands.Cog):
